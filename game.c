@@ -1,68 +1,46 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
+// game.c — engine impl
+#include "game.h"
 
-// Declare AI functions from minimax.c
-int winBy(char b[9], char p);
+// AI (from minimax.c)
 int findBestMoveLvl(char b[9], int level);
+int winBy(char b[9], char p);
 
-void printBoard(char b[9]) {
-    printf("\n %c | %c | %c\n", b[0], b[1], b[2]);
-    printf("---+---+---\n");
-    printf(" %c | %c | %c\n", b[3], b[4], b[5]);
-    printf("---+---+---\n");
-    printf(" %c | %c | %c\n\n", b[6], b[7], b[8]);
+static void board_init(char b[9]) {
+    for (int i=0;i<9;i++) b[i] = '1'+i;
 }
 
-void playGame(int mode) {
-    char b[9] = {'1','2','3','4','5','6','7','8','9'};
-    int turn = 0;
-    int pos;
-    char mark;
-    int win = 0;
-    int level = 2; // 1=easy, 2=medium, 3=hard
+void game_init(Game *g){ board_init(g->b); g->turn='X'; g->winner=0; }
+void game_reset(Game *g){ game_init(g); }
 
-    srand((unsigned)time(NULL));
-    printf("Player1=X , Player2=O\n");
+int game_is_full(const Game *g){
+    for (int i=0;i<9;i++) if (g->b[i] != 'X' && g->b[i] != 'O') return 0;
+    return 1;
+}
 
-    while (1) {
-        printBoard(b);
-        mark = (turn % 2 == 0) ? 'X' : 'O';
+int game_make_move(Game *g, int idx){
+    if (idx < 0 || idx > 8) return 0;
+    if (g->b[idx]=='X' || g->b[idx]=='O') return 0;
+    g->b[idx] = g->turn;
+    g->turn = (g->turn=='X') ? 'O' : 'X';
+    return 1;
+}
 
-        if (mode == 2 && mark == 'O') {
-            pos = findBestMoveLvl(b, level);
-            printf("AI chooses position %d\n", pos);
-        } else {
-            printf("Player %d (%c), enter a position (1-9): ", (turn % 2) + 1, mark);
-            if (scanf("%d", &pos) != 1) {
-                int c; while ((c = getchar()) != '\n' && c != EOF) {}
-                printf("Invalid input! Try again.\n");
-                continue;
-            }
-            if (pos < 1 || pos > 9) {
-                printf("Invalid number! Try again.\n");
-                continue;
-            }
-            if (b[pos - 1] == 'X' || b[pos - 1] == 'O') {
-                printf("That spot is already taken!\n");
-                continue;
-            }
-        }
+void game_check_end(Game *g){
+    if (winBy(g->b,'X')) { g->winner = 1; return; }
+    if (winBy(g->b,'O')) { g->winner = 2; return; }
+    if (game_is_full(g))  { g->winner = 3; return; }
+    g->winner = 0;
+}
 
-        b[pos - 1] = mark;
-
-        if (winBy(b, 'X') || winBy(b, 'O')) {
-            printBoard(b);
-            printf("Player %d (%c) won!!!\n", (turn % 2) + 1, mark);
-            break;
-        }
-
-        if (turn == 8) {
-            printBoard(b);
-            printf("Draw Game!\n");
-            break;
-        }
-
-        turn++;
+void game_ai_move(Game *g, int level){
+    if (g->turn != 'O') return;
+    int mv = findBestMoveLvl(g->b, level); // expect 0..8
+    if (mv>=0 && mv<9 && g->b[mv]!='X' && g->b[mv]!='O') {
+        g->b[mv] = 'O';
+        g->turn  = 'X';
+    } else {
+        // fallback: first free
+        for (int i=0;i<9;i++)
+            if (g->b[i]!='X' && g->b[i]!='O'){ g->b[i]='O'; g->turn='X'; break; }
     }
 }
