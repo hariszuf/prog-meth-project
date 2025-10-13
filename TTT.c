@@ -30,6 +30,7 @@ int main(){
         printf("Player %d (%c), enter a position (1-9): ", (turn % 2) + 1, mark);
         scanf("%d", &pos);
 
+        /* FIX: use || (OR) and && (AND), not bitwise & or | */
         if (pos < 1 || pos > 9){
             printf("Invalid number! Try again.\n");
             continue;
@@ -41,10 +42,15 @@ int main(){
 
         b[pos - 1] = mark;
 
-        if ((b[0]==b[1]&&b[1]==b[2]) || (b[3]==b[4]&&b[4]==b[5]) ||
-            (b[6]==b[7]&&b[7]==b[8]) || (b[0]==b[3]&&b[3]==b[6]) ||
-            (b[1]==b[4]&&b[4]==b[7]) || (b[2]==b[5]&&b[5]==b[8]) ||
-            (b[0]==b[4]&&b[4]==b[8]) || (b[2]==b[4]&&b[4]==b[6])) {
+        /* winner check: any line true => win (use ||) */
+        if ( (b[0]==b[1] && b[1]==b[2]) ||
+             (b[3]==b[4] && b[4]==b[5]) ||
+             (b[6]==b[7] && b[7]==b[8]) ||
+             (b[0]==b[3] && b[3]==b[6]) ||
+             (b[1]==b[4] && b[4]==b[7]) ||
+             (b[2]==b[5] && b[5]==b[8]) ||
+             (b[0]==b[4] && b[4]==b[8]) ||
+             (b[2]==b[4] && b[4]==b[6]) ) {
             win = 1;
         }
 
