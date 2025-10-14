@@ -11,14 +11,14 @@ Negative outcomes (X loses): 332 (34.66%)
 TRAINING SET STATISTICS
 ----------------------------------------
 Total samples: 766 (79.96% of full dataset)
-Positive outcomes: 626 (81.72%)
-Negative outcomes: 140 (18.28%)
+Positive outcomes: 498 (65.01%)
+Negative outcomes: 268 (34.99%)
 
 TESTING SET STATISTICS
 ----------------------------------------
 Total samples: 192 (20.04% of full dataset)
-Positive outcomes: 0 (0.00%)
-Negative outcomes: 192 (100.00%)
+Positive outcomes: 128 (66.67%)
+Negative outcomes: 64 (33.33%)
 
 DATA SPLIT CONFIGURATION
 ----------------------------------------
@@ -26,6 +26,7 @@ Training/Testing split: 80/20
 Features per sample: 9
 Feature encoding: x (X player), o (O player), b (blank)
 Target variable: positive (X wins), negative (X loses/draws)
+Shuffling: YES (Random seed based on system time)
 
 OUTPUT FILES
 ----------------------------------------
