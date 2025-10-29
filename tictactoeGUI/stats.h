@@ -1,8 +1,8 @@
-// stats.h — separate categories (PvP, PvC)
+// stats.h — separate categories (PvP, PvAI)
 #ifndef STATS_H
 #define STATS_H
 
-typedef enum { STATS_PVP = 0, STATS_PVC = 1 } StatsMode;
+typedef enum { STATS_PVP = 0, STATS_PVAI = 1 } StatsMode;
 
 // winner codes: 1 = X, 2 = O, 0 = draw
 void stats_record_result_mode(StatsMode mode, int winner);

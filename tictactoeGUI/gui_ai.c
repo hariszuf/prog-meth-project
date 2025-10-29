@@ -15,7 +15,7 @@ static bool Btn(Rectangle r, const char* label, Color bg, Color fg) {
 }
 
 int main(void) {
-    const int W=700, H=760, CELL=120, OFFX=50, OFFY=140;
+    const int W=600, H=760, CELL=120, OFFX=50, OFFY=140;
     InitWindow(W,H,"Tic Tac Toe (GUI)"); SetTargetFPS(60); SetRandomSeed((unsigned)time(NULL));
 
     Game g; game_init(&g);
