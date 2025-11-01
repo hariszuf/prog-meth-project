@@ -1,0 +1,6 @@
+gcc main.c game.c minimax.c stats.c -o tictactoe
+
+gcc gui_ai.c game.c minimax.c stats.c -o ttt_gui -I "C:\raylib-5.5_win64_mingw-w64\include" -L "C:\raylib-5.5_win64_mingw-w64\lib" -lraylib -lopengl32 -lgdi32 -lwinmm -luser32 -lshell32 -lws2_32
+
+
+./ttt_gui.exe
