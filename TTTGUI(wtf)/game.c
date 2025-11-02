@@ -11,7 +11,7 @@ static void board_init(char b[9])
 }
 
 
-// Public: start a new game
+// Public: start a new game 
 void game_init(Game *g)
 {
     board_init(g->b);                       // set board to initial digits
