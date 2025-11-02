@@ -1,496 +1,347 @@
 // gui_ai.c — GUI Tic-Tac-Toe (PvP/PvAI) using raylib
-#include "raylib.h"     // raylib graphics and input functions
-#include <string.h>     // C string functions like strlen (not heavily used here)
-#include <time.h>       // time() for random seed
-#include <stdio.h>      // snprintf() to format scoreboard text
-#include "game.h"       // our game engine header (Game struct and functions)
-#include "stats.h"      // stats functions for PvP/PvAI
+#include "raylib.h"     // raylib graphics library
+#include <string.h>     // for strcpy
+#include <time.h>       // for time() to seed random
+#include <stdio.h>      // for snprintf
+#include "game.h"       // game logic functions
+#include "stats.h"      // statistics tracking
 
-/*------------------------------------------------------------
-  Helper Button function
-  Draws a rectangle button with a label and returns true if clicked
--------------------------------------------------------------*/
+// Button helper: draws button and returns true if clicked
 static bool Btn(Rectangle r, const char* label, Color bg, Color fg)
 {
-    Vector2 m;                            // store mouse (x,y)
-    bool hot;                             // whether mouse is over the button
-    bool pressed;                         // whether mouse button is pressed now
-    Color paint;                          // background color to draw (normal/hover)
-
-    // Get current mouse position from raylib
-    m = GetMousePosition();
-
-    // Check if mouse is inside the rectangle r
-    hot = CheckCollisionPointRec(m, r);
-
-    // If mouse is over the button, brighten color a bit
-    if (hot)
+    Vector2 m = GetMousePosition();                      // get current mouse position
+    bool hot = CheckCollisionPointRec(m, r);             // check if mouse is over button
+    
+    Color paint;                                          // color to paint button
+    if (hot)                                             // if mouse is over button
     {
-        paint = ColorBrightness(bg, 0.15f);
+        paint = ColorBrightness(bg, 0.15f);              // brighten the color
     }
     else
     {
-        paint = bg;
+        paint = bg;                                       // use normal color
     }
 
-    // Draw filled rectangle for button background
-    DrawRectangleRec(r, paint);
+    DrawRectangleRec(r, paint);                          // draw button background
+    DrawRectangleLinesEx(r, 2, BLACK);                   // draw button border
+    DrawText(label, (int)(r.x + 10), (int)(r.y + 8), 20, fg); // draw button text
 
-    // Draw a black border around the button (thickness 2 pixels)
-    DrawRectangleLinesEx(r, 2, BLACK);
-
-    // Draw the label text with some padding
-    DrawText(label, (int)(r.x + 10), (int)(r.y + 8), 20, fg);
-
-    // Check if left mouse button was pressed this frame
-    pressed = IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
-
-    // If mouse is on button AND mouse was pressed, return true (clicked)
-    if (hot)
+    if (hot && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))  // if hovering and clicked
     {
-        if (pressed)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return true;                                      // button was clicked
     }
     else
     {
-        return false;
+        return false;                                     // button not clicked
     }
 }
 
-/*------------------------------------------------------------
-  Main program entry
--------------------------------------------------------------*/
 int main(void)
 {
-    // Window and board layout constants
-    const int W   = 720;     // window width
-    const int H   = 760;     // window height
-    const int CELL = 120;    // one grid cell size in pixels
-    const int OFFX = 50;     // left offset for grid
-    const int OFFY = 140;    // top offset for grid
+    const int W = 720;      // window width
+    const int H = 760;      // window height
+    const int CELL = 120;   // size of each grid cell
+    const int OFFX = 50;    // grid x offset from left
+    const int OFFY = 140;   // grid y offset from top
 
-    // Create a window with given size and title
-    InitWindow(W, H, "Tic Tac Toe (GUI)");
+    InitWindow(W, H, "Tic Tac Toe (GUI)");  // create window
+    SetTargetFPS(60);                       // limit to 60 fps
+    SetRandomSeed((unsigned)time(NULL));    // seed random for AI
 
-    // Limit drawing / update to 60 frames per second
-    SetTargetFPS(60);
+    Game g;           // game state
+    game_init(&g);    // initialize game
 
-    // Seed raylib random (used in AI levels 1 and 2)
-    SetRandomSeed((unsigned)time(NULL));
+    int mode = 1;     // game mode: 0=PvP, 1=PvAI
+    int level = 2;    // AI difficulty: 1=Easy, 2=Medium, 3=Hard
+    int recorded = 0; // flag to prevent recording stats twice
 
-    // Create a Game struct and initialize it (board 1..9, X starts)
-    Game g;
-    game_init(&g);
-
-    // Mode: 0 = PvP (two humans), 1 = PvAI (human X vs AI O)
-    int mode = 1;
-
-    // AI difficulty level: 1=Easy, 2=Medium, 3=Hard
-    int level = 2;
-
-    // Guard to ensure we record stats only once after a game ends
-    int recorded = 0;
-
-    // Main loop: runs until the user closes the window (ESC or OS close)
-    while (!WindowShouldClose())
+    while (!WindowShouldClose())  // main game loop
     {
-        bool clickConsumed;   // track if a click was used by UI buttons
+        bool clickConsumed = false; // track if click was used by UI
 
-        // Start each frame with "no button used the click yet"
-        clickConsumed = false;
+        // UI button layout variables
+        int font = 20;  // font size
+        int padX = 20;  // button padding
+        int btnH = 40;  // button height
+        int gap = 10;   // gap between buttons
+        int x = 20;     // current x position for placing buttons
+        int y = 20;     // y position for buttons
 
-        // Top bar UI layout values
-        int font  = 20;
-        int padX  = 20;
-        int btnH  = 40;
-        int gap   = 10;
-        int x     = 20;
-        int y     = 20;
-
-        // Measure text width for buttons so we size them neatly
+        // Calculate button widths based on text
         int wPVP = MeasureText("Player vs Player", font) + padX;
-        int wAI  = MeasureText("Player vs AI",     font) + padX;
-        int wE   = MeasureText("E", font) + padX;
-        int wM   = MeasureText("M", font) + padX;
-        int wH   = MeasureText("H", font) + padX;
+        int wAI = MeasureText("Player vs AI", font) + padX;
+        int wE = MeasureText("E", font) + padX;
+        int wM = MeasureText("M", font) + padX;
+        int wH = MeasureText("H", font) + padX;
 
-        // Define rectangles for each button (x grows as we place each button)
-        Rectangle bPVP = (Rectangle){ (float)x, (float)y, (float)wPVP, (float)btnH };
-        x = x + wPVP + gap;
+        // Define button rectangles
+        Rectangle bPVP = {(float)x, (float)y, (float)wPVP, (float)btnH}; // PvP button
+        x += wPVP + gap;  // move x position for next button
+        Rectangle bAI = {(float)x, (float)y, (float)wAI, (float)btnH};   // PvAI button
+        x += wAI + gap;   // move x position
+        Rectangle bE = {(float)x, (float)y, (float)wE, (float)btnH};     // Easy button
+        x += wE + gap;    // move x position
+        Rectangle bM = {(float)x, (float)y, (float)wM, (float)btnH};     // Medium button
+        x += wM + gap;    // move x position
+        Rectangle bH = {(float)x, (float)y, (float)wH, (float)btnH};     // Hard button
 
-        Rectangle bAI  = (Rectangle){ (float)x, (float)y, (float)wAI,  (float)btnH };
-        x = x + wAI + gap;
-
-        Rectangle bE   = (Rectangle){ (float)x, (float)y, (float)wE,   (float)btnH };
-        x = x + wE + gap;
-
-        Rectangle bM   = (Rectangle){ (float)x, (float)y, (float)wM,   (float)btnH };
-        x = x + wM + gap;
-
-        Rectangle bH   = (Rectangle){ (float)x, (float)y, (float)wH,   (float)btnH };
-
-        // ----- Handle UI Buttons -----
-
-        // Player vs Player mode button
+        // Handle PvP mode button click
         if (Btn(bPVP, "Player vs Player", (mode == 0 ? GREEN : LIGHTGRAY), BLACK))
         {
-            mode = 0;                 // set mode to PvP
-            game_reset(&g);           // reset the current game
-            recorded = 0;             // clear the stats guard
-            clickConsumed = true;     // we used this click on a button
+            mode = 0;           // switch to PvP mode
+            game_reset(&g);     // reset the game
+            recorded = 0;       // clear stats recording flag
+            clickConsumed = true; // mark click as used
         }
 
-        // Player vs AI mode button
+        // Handle PvAI mode button click
         if (Btn(bAI, "Player vs AI", (mode == 1 ? GREEN : LIGHTGRAY), BLACK))
         {
-            mode = 1;                 // set mode to PvAI
-            game_reset(&g);           // reset the current game
-            recorded = 0;             // clear the stats guard
-            clickConsumed = true;     // we used this click on a button
+            mode = 1;           // switch to PvAI mode
+            game_reset(&g);     // reset the game
+            recorded = 0;       // clear stats recording flag
+            clickConsumed = true; // mark click as used
         }
 
-        // Difficulty buttons shown only when in PvAI mode
+        // Show difficulty buttons only in PvAI mode
         if (mode == 1)
         {
-            // Easy button
+            // Easy difficulty button
             if (Btn(bE, "E", (level == 1 ? ORANGE : LIGHTGRAY), BLACK))
             {
-                level = 1;            // set level to Easy
-                clickConsumed = true; // consume this click
+                level = 1;          // set difficulty to Easy
+                clickConsumed = true; // mark click as used
             }
-
-            // Medium button
+            // Medium difficulty button
             if (Btn(bM, "M", (level == 2 ? ORANGE : LIGHTGRAY), BLACK))
             {
-                level = 2;            // set level to Medium
-                clickConsumed = true; // consume this click
+                level = 2;          // set difficulty to Medium
+                clickConsumed = true; // mark click as used
             }
-
-            // Hard button
+            // Hard difficulty button
             if (Btn(bH, "H", (level == 3 ? ORANGE : LIGHTGRAY), BLACK))
             {
-                level = 3;            // set level to Hard
-                clickConsumed = true; // consume this click
+                level = 3;          // set difficulty to Hard
+                clickConsumed = true; // mark click as used
             }
         }
 
-        // Pressing R resets the game (handy during testing)
+        // Handle R key press to reset game
         if (IsKeyPressed(KEY_R))
         {
-            game_reset(&g);           // reset the board and turn
-            recorded = 0;             // allow stats to be written again after finish
+            game_reset(&g);  // reset the game
+            recorded = 0;    // clear stats recording flag
         }
 
-        // ----- Human board click handling -----
-        // Only process if no UI button used the click,
-        // game is not finished, and left mouse was pressed
-        if (!clickConsumed)
+        // Handle board clicks (only if UI didn't consume click, game not over, and mouse clicked)
+        if (!clickConsumed && g.winner == 0 && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
         {
-            if (g.winner == 0)
+            Vector2 mpos = GetMousePosition();             // get mouse position
+            int c = (int)((mpos.x - OFFX) / CELL);         // calculate column from mouse x
+            int r = (int)((mpos.y - OFFY) / CELL);         // calculate row from mouse y
+
+            // Check if click is inside the grid
+            if (c >= 0 && c < 3 && r >= 0 && r < 3)
             {
-                if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+                int i = r * 3 + c;  // convert row,col to board index
+
+                // In PvP, both can click. In PvAI, only X (human) can click
+                if (mode == 0 || (mode == 1 && g.turn == 'X'))
                 {
-                    Vector2 mpos;      // mouse position
-                    int c;             // column index on grid (0..2)
-                    int r;             // row index on grid (0..2)
-                    int i;             // board index (0..8)
-
-                    // Get mouse position
-                    mpos = GetMousePosition();
-
-                    // Convert mouse XY into grid coordinates
-                    c = (int)((mpos.x - OFFX) / CELL);
-                    r = (int)((mpos.y - OFFY) / CELL);
-
-                    // Check if click is inside the 3x3 grid
-                    if (c >= 0 && c < 3)
+                    if (game_make_move(&g, i))  // try to make move
                     {
-                        if (r >= 0 && r < 3)
-                        {
-                            // Convert (r,c) to single index i
-                            i = r * 3 + c;
-
-                            // In PvP mode, anyone can click when it's their turn
-                            // In PvAI mode, only allow human 'X' to click
-                            if (mode == 0)
-                            {
-                                if (game_make_move(&g, i))
-                                {
-                                    game_check_end(&g);   // update winner if any
-                                }
-                            }
-                            else
-                            {
-                                if (mode == 1)
-                                {
-                                    if (g.turn == 'X')
-                                    {
-                                        if (game_make_move(&g, i))
-                                        {
-                                            game_check_end(&g);   // update winner if any
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        game_check_end(&g);     // check if game ended
                     }
                 }
             }
         }
 
-        // ----- AI turn (only in PvAI mode) -----
+        // AI turn: if PvAI mode, game not over, and it's O's turn
+        if (mode == 1 && g.winner == 0 && g.turn == 'O')
+        {
+            game_ai_move(&g, level);  // AI makes a move
+            game_check_end(&g);       // check if game ended
+        }
+
+        // Record statistics once per game when game ends
+        if (g.winner != 0 && !recorded)
+        {
+            int code;  // code to pass to stats
+            
+            if (g.winner == 1)  // if X wins
+            {
+                code = 1;  // X wins code
+            }
+            else if (g.winner == 2)  // if O wins
+            {
+                code = 2;  // O wins code
+            }
+            else  // if draw
+            {
+                code = 0;  // draw code
+            }
+
+            if (mode == 0)  // if PvP mode
+            {
+                stats_record_result_mode(STATS_PVP, code);  // record PvP stats
+            }
+            else  // if PvAI mode
+            {
+                stats_record_result_mode(STATS_PVAI, code);  // record PvAI stats
+            }
+            
+            recorded = 1;  // mark as recorded
+        }
+
+        // Start drawing this frame
+        BeginDrawing();
+        ClearBackground(RAYWHITE);  // clear screen to white
+
+        // Display current mode
+        DrawText("Mode:", 20, 70, 20, DARKGRAY);  // label
+        if (mode == 0)  // if PvP mode
+        {
+            DrawText("Player vs Player", 90, 70, 20, BLACK);  // PvP text
+        }
+        else  // if PvAI mode
+        {
+            DrawText("Player vs AI", 90, 70, 20, BLACK);  // PvAI text
+        }
+
+        // Display difficulty (only in PvAI mode)
         if (mode == 1)
         {
-            if (g.winner == 0)
+            DrawText("Difficulty:", 270, 70, 20, DARKGRAY);  // label
+            
+            if (level == 1)  // if Easy
             {
-                if (g.turn == 'O')
-                {
-                    game_ai_move(&g, level);  // let AI place 'O'
-                    game_check_end(&g);       // check for win/draw
-                }
+                DrawText("Easy", 380, 70, 20, BLACK);  // draw Easy
+            }
+            else if (level == 2)  // if Medium
+            {
+                DrawText("Medium", 380, 70, 20, BLACK);  // draw Medium
+            }
+            else  // if Hard
+            {
+                DrawText("Hard", 380, 70, 20, BLACK);  // draw Hard
             }
         }
 
-        // ----- Record stats once after the game finishes -----
-        if (g.winner != 0)
+        // Draw the 3x3 grid
+        for (int i = 1; i < 3; i++)  // loop for 2 lines (creates 3 sections)
         {
-            if (!recorded)
-            {
-                int code;  // 1 for X win, 2 for O win, 0 for draw
-
-                // Translate g.winner to stats code
-                if (g.winner == 1)
-                {
-                    code = 1; // X wins
-                }
-                else
-                {
-                    if (g.winner == 2)
-                    {
-                        code = 2; // O wins
-                    }
-                    else
-                    {
-                        code = 0; // draw
-                    }
-                }
-
-                // Choose stats category based on mode and record it
-                if (mode == 0)
-                {
-                    stats_record_result_mode(STATS_PVP, code);
-                }
-                else
-                {
-                    stats_record_result_mode(STATS_PVAI, code);
-                }
-
-                // Prevent recording twice for the same finished game
-                recorded = 1;
-            }
+            DrawLine(OFFX, OFFY + i * CELL, OFFX + 3 * CELL, OFFY + i * CELL, BLACK); // horizontal line
+            DrawLine(OFFX + i * CELL, OFFY, OFFX + i * CELL, OFFY + 3 * CELL, BLACK); // vertical line
         }
+        DrawRectangleLines(OFFX, OFFY, 3 * CELL, 3 * CELL, BLACK); // outer border
 
-        // ----- Drawing section -----
-        BeginDrawing();                         // start drawing frame
-        ClearBackground(RAYWHITE);              // clear screen to white
-
-        // Show mode text
-        DrawText("Mode:", 20, 70, 20, DARKGRAY);
-        if (mode == 0)
+        // Draw all X's and O's on the board
+        for (int i = 0; i < 9; i++)  // loop through all 9 cells
         {
-            DrawText("Player vs Player", 90, 70, 20, BLACK);
+            int r = i / 3;                       // calculate row
+            int c = i % 3;                       // calculate column
+            int cx = OFFX + c * CELL + CELL / 2; // center x of cell
+            int cy = OFFY + r * CELL + CELL / 2; // center y of cell
+
+            if (g.b[i] == 'X')  // if cell has X
+            {
+                DrawLine(cx - 30, cy - 30, cx + 30, cy + 30, RED); // draw \ line
+                DrawLine(cx - 30, cy + 30, cx + 30, cy - 30, RED); // draw / line
+            }
+            else if (g.b[i] == 'O')  // if cell has O
+            {
+                DrawCircleLines(cx, cy, 38, BLUE);  // draw circle
+            }
         }
-        else
+
+        // Build status message text
+        char status[128];  // buffer for status text
+        if (g.winner == 0)  // game still in progress
         {
-            DrawText("Player vs AI", 90, 70, 20, BLACK);
+            if (g.turn == 'X')  // X's turn
+            {
+                strcpy(status, "Turn: Player 1 (X)");  // human X turn message
+            }
+            else  // O's turn
+            {
+                if (mode == 0)  // if PvP mode
+                {
+                    strcpy(status, "Turn: Player 2 (O)");  // Player 2 turn message
+                }
+                else  // if PvAI mode
+                {
+                    strcpy(status, "AI (O) is playing...");  // AI turn message
+                }
+            }
         }
-
-        // If PvAI mode, show difficulty text
-        if (mode == 1)
+        else  // game finished
         {
-            DrawText("Difficulty:", 270, 70, 20, DARKGRAY);
-
-            if (level == 1)
+            if (g.winner == 1)  // X won
             {
-                DrawText("Easy", 380, 70, 20, BLACK);
+                strcpy(status, "Winner: Player 1 (X)");  // X wins message
             }
-            else
+            else if (g.winner == 2)  // O won
             {
-                if (level == 2)
+                if (mode == 0)  // if PvP mode
                 {
-                    DrawText("Medium", 380, 70, 20, BLACK);
+                    strcpy(status, "Winner: Player 2 (O)");  // Player 2 wins message
                 }
-                else
+                else  // if PvAI mode
                 {
-                    DrawText("Hard", 380, 70, 20, BLACK);
+                    strcpy(status, "Winner: AI (O)");  // AI wins message
                 }
+            }
+            else  // draw
+            {
+                strcpy(status, "Result: Draw");  // draw message
             }
         }
 
-        // Draw the 3x3 grid lines
+        // Draw player labels
+        DrawText("Player 1: X", 20, 100, 20, DARKGRAY);  // X label
+        if (mode == 0)  // if PvP mode
         {
-            int i; // loop counter for lines
-            for (i = 1; i < 3; i++)
-            {
-                // horizontal lines
-                DrawLine(OFFX, OFFY + i * CELL, OFFX + 3 * CELL, OFFY + i * CELL, BLACK);
-                // vertical lines
-                DrawLine(OFFX + i * CELL, OFFY, OFFX + i * CELL, OFFY + 3 * CELL, BLACK);
-            }
-
-            // outer border rectangle
-            DrawRectangleLines(OFFX, OFFY, 3 * CELL, 3 * CELL, BLACK);
+            DrawText("Player 2: O", 170, 100, 20, DARKGRAY);  // Player 2 label
         }
-
-        // Draw all marks on the board
+        else  // if PvAI mode
         {
-            int i; // index 0..8
-            for (i = 0; i < 9; i++)
-            {
-                int r; // row
-                int c; // column
-                int cx;// center x of the cell
-                int cy;// center y of the cell
-
-                r  = i / 3;
-                c  = i % 3;
-                cx = OFFX + c * CELL + CELL / 2;
-                cy = OFFY + r * CELL + CELL / 2;
-
-                if (g.b[i] == 'X')
-                {
-                    // draw an 'X' with two red lines
-                    DrawLine(cx - 30, cy - 30, cx + 30, cy + 30, RED);
-                    DrawLine(cx - 30, cy + 30, cx + 30, cy - 30, RED);
-                }
-                else
-                {
-                    if (g.b[i] == 'O')
-                    {
-                        // draw an 'O' as a blue circle outline
-                        DrawCircleLines(cx, cy, 38, BLUE);
-                    }
-                }
-            }
+            DrawText("AI: O", 170, 100, 20, DARKGRAY);  // AI label
         }
 
-        // Build a status message (no ternary operators)
+        // Draw status message
+        DrawText(status, 20, OFFY + 3 * CELL + 20, 24, BLACK);  // main status
+        DrawText("Click cells to play. Press R to reset. ESC to quit.",
+                 20, OFFY + 3 * CELL + 56, 18, GRAY);  // help text
+
+        // Draw scoreboard
+        int games, xw, ow, dr;  // variables for stats
+        
+        if (mode == 0)  // if PvP mode
         {
-            char status[128];   // text to show under the board
-
-            // If game not finished
-            if (g.winner == 0)
-            {
-                if (g.turn == 'X')
-                {
-                    // Always human X's turn label
-                    strcpy(status, "Turn: Player 1 (X)");
-                }
-                else
-                {
-                    // g.turn == 'O'
-                    if (mode == 0)
-                    {
-                        // PvP: it's player 2 turn
-                        strcpy(status, "Turn: Player 2 (O)");
-                    }
-                    else
-                    {
-                        // PvAI: show AI is moving
-                        strcpy(status, "AI (O) is playing...");
-                    }
-                }
-            }
-            else
-            {
-                // Game finished
-                if (g.winner == 1)
-                {
-                    // X won
-                    strcpy(status, "Winner: Player 1 (X)");
-                }
-                else
-                {
-                    if (g.winner == 2)
-                    {
-                        // O won
-                        if (mode == 0)
-                        {
-                            strcpy(status, "Winner: Player 2 (O)");
-                        }
-                        else
-                        {
-                            strcpy(status, "Winner: AI (O)");
-                        }
-                    }
-                    else
-                    {
-                        // draw
-                        strcpy(status, "Result: Draw");
-                    }
-                }
-            }
-
-            // Draw fixed player labels above the status
-            DrawText("Player 1: X", 20, 100, 20, DARKGRAY);
-
-            if (mode == 0)
-            {
-                DrawText("Player 2: O", 170, 100, 20, DARKGRAY);
-            }
-            else
-            {
-                DrawText("AI: O", 170, 100, 20, DARKGRAY);
-            }
-
-            // Draw the computed status under the board
-            DrawText(status, 20, OFFY + 3 * CELL + 20, 24, BLACK);
-
-            // Helper hint text
-            DrawText("Click cells to play. Press R to reset. ESC to quit.",
-                     20, OFFY + 3 * CELL + 56, 18, GRAY);
+            stats_get_counts_mode(STATS_PVP, &games, &xw, &ow, &dr);  // get PvP stats
         }
-
-        // Draw category scoreboard (PvP or PvAI)
+        else  // if PvAI mode
         {
-            int games;  // total games
-            int xw;     // X wins
-            int ow;     // O wins
-            int dr;     // draws
-            char line[256];   // buffer for one scoreboard line
-
-            // Read stats based on current mode
-            if (mode == 0)
-            {
-                stats_get_counts_mode(STATS_PVP, &games, &xw, &ow, &dr);
-            }
-            else
-            {
-                stats_get_counts_mode(STATS_PVAI, &games, &xw, &ow, &dr);
-            }
-
-            // Format "PvP | Games:.. Win:.. Lose:.. Draw:.."
-            // Note: "Win" shows X wins and "Lose" shows O wins from X's perspective
-            snprintf(line, sizeof(line),
-                     "%s | Games:%d  X Win:%d  O Win:%d  Draw:%d",
-                     (mode == 0 ? "PvP" : "PvAI"), games, xw, ow, dr);
-
-            // Draw the scoreboard text
-            DrawText(line, 20, OFFY + 3 * CELL + 90, 20, DARKBLUE);
+            stats_get_counts_mode(STATS_PVAI, &games, &xw, &ow, &dr);  // get PvAI stats
         }
 
-        EndDrawing();                           // finish drawing this frame
+        char line[256];  // buffer for scoreboard text
+        if (mode == 0)  // if PvP mode
+        {
+            snprintf(line, sizeof(line), "PvP | Games:%d  X Win:%d  O Win:%d  Draw:%d",
+                     games, xw, ow, dr);  // format PvP scoreboard
+        }
+        else  // if PvAI mode
+        {
+            snprintf(line, sizeof(line), "PvAI | Games:%d  X Win:%d  O Win:%d  Draw:%d",
+                     games, xw, ow, dr);  // format PvAI scoreboard
+        }
+        
+        DrawText(line, 20, OFFY + 3 * CELL + 90, 20, DARKBLUE);  // draw scoreboard
+
+        EndDrawing();  // finish drawing this frame
     }
 
-    // Close the window and free internal resources
-    CloseWindow();
-
-    // Return 0 from main (success)
-    return 0;
+    CloseWindow();  // close window and cleanup
+    return 0;       // exit program
 }
