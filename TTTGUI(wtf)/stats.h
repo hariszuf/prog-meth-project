@@ -1,5 +1,5 @@
 // stats.h — public functions to record and read stats
-#ifndef STATS_H                 // include guard start
+#ifndef STATS_H
 #define STATS_H
 
 // Two categories: Player vs Player, Player vs AI
@@ -15,4 +15,4 @@ void stats_record_result_mode(StatsMode mode, int winner);
 // Read the counts back (any pointer may be NULL if caller does not need it)
 void stats_get_counts_mode(StatsMode mode,int *games,int *x_wins,int *o_wins,int *draws);
 
-#endif // STATS_H               // include guard end
+#endif // STATS_H

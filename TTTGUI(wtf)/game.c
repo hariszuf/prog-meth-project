@@ -1,11 +1,7 @@
 // game.c — game engine implementation (no printing here)
 #include "game.h"            // bring in Game struct and prototypes
+#include "minimax.h"        // AI helper functions
 
-// Prototypes from AI module so we can call them
-int findBestMoveLvl(char b[9], int level); // returns best index or -1
-int winBy(char b[9], char p);              // helper: check win for player p
-
-// Helper: fill board with digits '1'..'9' to show empty cells
 static void board_init(char b[9])
 {
     for (int i = 0; i < 9; i++)
@@ -70,31 +66,21 @@ int game_make_move(Game *g, int indexrange)
 }
 
 // Public: set winner state based on current board
-void game_check_end(Game *g)
-{
-    // if X has a winning line, set winner to 1
-    if (winBy(g->b, 'X'))
-    {
-        g->winner = 1;                      // X wins
-        return;                             // stop checking
-    }
-    else if (winBy(g->b, 'O'))
-    {
+void game_check_end(Game *g) {
+    if (winBy(g->b, 'X')) {
+        g->winner = 1;
+    } 
+    else if (winBy(g->b, 'O')) {
         g->winner = 2;
-        return;
-    }
-    else{
-        if (game_is_full(g))
-        {
-            g->winner = 3;
-            return;
-        }
-        else
-        {
-            g->winner = 0;
-        }
+    } 
+    else if (game_is_full(g)) {
+        g->winner = 3;
+    } 
+    else {
+        g->winner = 0;
     }
 }
+
 
 // Public: if it's O's turn, ask AI to play based on level (1..3)
 void game_ai_move(Game *g, int level)
@@ -110,17 +96,11 @@ void game_ai_move(Game *g, int level)
     mv = findBestMoveLvl(g->b, level);      // try AI to find index (0..8) or -1
 
     // If AI returned a valid empty cell, use it
-    if (mv >= 0)
+    if (mv >= 0 && mv < 9 && g->b[mv] != 'X' && g->b[mv] != 'O')
     {
-        if (mv < 9)
-        {
-            if (g->b[mv] != 'X' && g->b[mv] != 'O')
-            {
-                g->b[mv] = 'O';             // place O
-                g->turn = 'X';              // switch turn to X
-                return;                     // done
-            }
-        }
+        g->b[mv] = 'O';             // place O
+        g->turn = 'X';              // switch turn to X
+        return;                     // done
     }
 
     // Fallback: choose the first free cell if AI failed

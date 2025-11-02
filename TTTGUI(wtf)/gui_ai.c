@@ -478,7 +478,7 @@ int main(void)
             // Format "PvP | Games:.. Win:.. Lose:.. Draw:.."
             // Note: "Win" shows X wins and "Lose" shows O wins from X's perspective
             snprintf(line, sizeof(line),
-                     "%s | Games:%d  Win:%d  Lose:%d  Draw:%d",
+                     "%s | Games:%d  X Win:%d  O Win:%d  Draw:%d",
                      (mode == 0 ? "PvP" : "PvAI"), games, xw, ow, dr);
 
             // Draw the scoreboard text

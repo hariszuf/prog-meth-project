@@ -1,5 +1,5 @@
 // game.h — game engine (no user I/O)
-#ifndef GAME_H               // include guard start: prevent double include
+#ifndef GAME_H
 #define GAME_H
 
 // Simple struct to hold game state
@@ -22,4 +22,4 @@ void game_check_end(Game *g);          // sets winner field
 // Ask AI (playing 'O') to move according to level 1..3
 void game_ai_move(Game *g, int level); // does nothing if not O's turn
 
-#endif // GAME_H             // include guard end
+#endif
