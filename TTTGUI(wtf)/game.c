@@ -3,9 +3,11 @@
 #include "minimax.h"        // AI helper functions
 
 static void board_init(char b[9])
-{
+{                                
     for (int i = 0; i < 9; i++)
+    {
         b[i] = ' ';   // initialize all to blank
+    }
 }
 
 
@@ -26,8 +28,7 @@ void game_reset(Game *g)
 // Public: check if there is any empty cell left
 int game_is_full(const Game *g)
 {
-    int i;                                  // loop counter
-    for (i = 0; i < 9; ++i)                 // scan all cells
+    for (int i = 0; i < 9; i++)                 // scan all cells
     {
         if (g->b[i] != 'X' && g->b[i] != 'O') // if cell is not taken
         {
@@ -38,26 +39,26 @@ int game_is_full(const Game *g)
 }
 
 // Public: place current player's mark at index (0..8) if legal
-int game_make_move(Game *g, int indexrange)
+int game_make_move(Game *g, int index)
 {
-    if (indexrange < 0 || indexrange > 8)                 // index out of range?
+    if (index < 0 || index > 8)                 // index out of range?
     {
         return 0;                           // reject
     }
 
-    if (g->b[indexrange] == 'X' || g->b[indexrange] == 'O') // already occupied?
+    if (g->b[index] == 'X' || g->b[index] == 'O') // already occupied?
     {
         return 0;                           // reject
     }
 
-    g->b[indexrange] = g->turn;                    // write current player's mark
+    g->b[index] = g->turn;                    // write current player's mark
 
     // switch turn to the other player (expanded if/else version)
     if (g->turn == 'X')
     {
         g->turn = 'O';                      // after X, now O moves
     }
-    else if(g->turn == 'O')
+    else
     {
         g->turn = 'X';                      // after O, now X moves
     }
@@ -85,15 +86,13 @@ void game_check_end(Game *g) {
 // Public: if it's O's turn, ask AI to play based on level (1..3)
 void game_ai_move(Game *g, int level)
 {
-    int i;                                  // loop counter
-    int mv;                                 // chosen move index
 
     if (g->turn != 'O')                     // not O's turn?
     {
         return;                             // do nothing
     }
 
-    mv = findBestMoveLvl(g->b, level);      // try AI to find index (0..8) or -1
+    int mv = findBestMoveLvl(g->b, level);      // try AI to find index (0..8) or -1
 
     // If AI returned a valid empty cell, use it
     if (mv >= 0 && mv < 9 && g->b[mv] != 'X' && g->b[mv] != 'O')
@@ -104,7 +103,7 @@ void game_ai_move(Game *g, int level)
     }
 
     // Fallback: choose the first free cell if AI failed
-    for (i = 0; i < 9; ++i)
+    for (int i = 0; i < 9; i++)
     {
         if (g->b[i] != 'X' && g->b[i] != 'O') // found a free spot
         {

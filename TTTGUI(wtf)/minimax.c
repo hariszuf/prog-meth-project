@@ -68,7 +68,7 @@ int winBy(char b[9], char p)
 static int has_space(const char b[9])
 {
     int i;                                  // loop counter
-    for (i = 0; i < 9; ++i)                 // scan all cells
+    for (i = 0; i < 9; i++)                 // scan all cells
     {
         if (b[i] != 'X' && b[i] != 'O')     // if we find a non-X/O
         {
@@ -141,7 +141,7 @@ static int minimax_cap(char b[9], int isMax, int depth, int maxDepth)
     if (isMax)                              // O's turn (maximize score)
     {
         best = -1000;                       // start with very low
-        for (i = 0; i < 9; ++i)             // try all cells
+        for (i = 0; i < 9; i++)             // try all cells
         {
             if (b[i] == 'X' || b[i] == 'O') // skip taken cells
             {
@@ -165,7 +165,7 @@ static int minimax_cap(char b[9], int isMax, int depth, int maxDepth)
     else                                    // X's turn (minimize score)
     {
         best = 1000;                        // start with very high
-        for (i = 0; i < 9; ++i)             // try all cells
+        for (i = 0; i < 9; i++)             // try all cells
         {
             if (b[i] == 'X' || b[i] == 'O') // skip taken cells
             {
@@ -203,7 +203,7 @@ int findBestMoveLvl(char b[9], int level)
     char save;                              // to undo move
 
     n = 0;                                  // start with 0 empty cells
-    for (i = 0; i < 9; ++i)                 // scan all cells
+    for (i = 0; i < 9; i++)                 // scan all cells
     {
         if (b[i] != 'X' && b[i] != 'O')     // if cell is empty
         {
@@ -229,7 +229,7 @@ int findBestMoveLvl(char b[9], int level)
             best = -1000;                   // else use shallow search
             move = empty[0];                // initialize to something valid
 
-            for (j = 0; j < n; ++j)         // try each empty position
+            for (j = 0; j < n; j++)         // try each empty position
             {
                 i = empty[j];               // candidate index
                 save = b[i];                // remember old char
@@ -257,7 +257,7 @@ int findBestMoveLvl(char b[9], int level)
             move = empty[0];                // best move index
             sec = empty[0];                 // second move index
 
-            for (j = 0; j < n; ++j)         // check all candidates
+            for (j = 0; j < n; j++)         // check all candidates
             {
                 i = empty[j];               // candidate index
                 save = b[i];                // remember old char
@@ -305,7 +305,7 @@ int findBestMoveLvl(char b[9], int level)
             best = -1000;                   // start low
             move = empty[0];                // initialize to valid position
 
-            for (j = 0; j < n; ++j)         // try each empty cell
+            for (j = 0; j < n; j++)         // try each empty cell
             {
                 i = empty[j];               // candidate index
                 save = b[i];                // remember old char
