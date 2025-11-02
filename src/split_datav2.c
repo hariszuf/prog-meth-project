@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #define TOTAL_SAMPLES 958
 #define FEATURES 9
@@ -18,6 +19,22 @@ typedef struct {
     Sample *data;
     int size;
 } Dataset;
+
+// Function to shuffle the dataset using Fisher-Yates algorithm
+void shuffleDataset(Dataset *dataset) {
+    srand(time(NULL));
+    
+    for (int i = dataset->size - 1; i > 0; i--) {
+        int j = rand() % (i + 1);
+        
+        // Swap dataset->data[i] and dataset->data[j]
+        Sample temp = dataset->data[i];
+        dataset->data[i] = dataset->data[j];
+        dataset->data[j] = temp;
+    }
+    
+    printf("Dataset shuffled randomly\n");
+}
 
 // Function to open and read the dataset file
 int readDataset(const char *filename, Dataset *dataset) {
@@ -207,7 +224,8 @@ int saveReport(const char *filename, Dataset *full, Dataset *train, Dataset *tes
     fprintf(fp, "Training/Testing split: 80/20\n");
     fprintf(fp, "Features per sample: %d\n", FEATURES);
     fprintf(fp, "Feature encoding: x (X player), o (O player), b (blank)\n");
-    fprintf(fp, "Target variable: positive (X wins), negative (X loses/draws)\n\n");
+    fprintf(fp, "Target variable: positive (X wins), negative (X loses/draws)\n");
+    fprintf(fp, "Shuffling: YES (Random seed based on system time)\n\n");
     
     fprintf(fp, "OUTPUT FILES\n");
     fprintf(fp, "----------------------------------------\n");
@@ -242,8 +260,19 @@ int main() {
         return 1;
     }
     
-    // Display first few samples
-    printf("\nFirst 3 samples:\n");
+    // Display first few samples BEFORE shuffling
+    printf("\nFirst 3 samples (before shuffling):\n");
+    for (int i = 0; i < 3 && i < fullDataset.size; i++) {
+        printf("\nSample %d:\n", i + 1);
+        displayBoard(&fullDataset.data[i]);
+    }
+    
+    // CRITICAL: Shuffle the dataset before splitting
+    printf("\n*** SHUFFLING DATASET ***\n");
+    shuffleDataset(&fullDataset);
+    
+    // Display first few samples AFTER shuffling
+    printf("\nFirst 3 samples (after shuffling):\n");
     for (int i = 0; i < 3 && i < fullDataset.size; i++) {
         printf("\nSample %d:\n", i + 1);
         displayBoard(&fullDataset.data[i]);
@@ -289,6 +318,7 @@ int main() {
     printf("  - test.data (Testing set: %d samples)\n", testSet.size);
     printf("  - dataset_report.txt (Detailed statistics)\n");
     printf("\nAll files saved in the current directory.\n");
+    printf("\n*** IMPORTANT: Data was randomly shuffled before splitting ***\n");
     
     // Clean up
     freeDataset(&fullDataset);
