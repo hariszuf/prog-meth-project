@@ -67,8 +67,8 @@ int winBy(char b[9], char p)
 // Helper: return 1 if there is at least one empty cell
 static int has_space(const char b[9])
 {
-    int i;                                  // loop counter
-    for (i = 0; i < 9; i++)                 // scan all cells
+                   
+    for (int i = 0; i < 9; i++)                 // scan all cells
     {
         if (b[i] != 'X' && b[i] != 'O')     // if we find a non-X/O
         {
