@@ -8,12 +8,10 @@ int winBy(char b[9], char p);              // helper: check win for player p
 // Helper: fill board with digits '1'..'9' to show empty cells
 static void board_init(char b[9])
 {
-    int i;                                  // loop counter
-    for (i = 0; i < 9; ++i)                 // go through all 9 cells
-    {
-        b[i] = (char)('1' + i);             // set cell to its digit character
-    }
+    for (int i = 0; i < 9; i++)
+        b[i] = ' ';   // initialize all to blank
 }
+
 
 // Public: start a new game
 void game_init(Game *g)
@@ -44,26 +42,26 @@ int game_is_full(const Game *g)
 }
 
 // Public: place current player's mark at index (0..8) if legal
-int game_make_move(Game *g, int idx)
+int game_make_move(Game *g, int indexrange)
 {
-    if (idx < 0 || idx > 8)                 // index out of range?
+    if (indexrange < 0 || indexrange > 8)                 // index out of range?
     {
         return 0;                           // reject
     }
 
-    if (g->b[idx] == 'X' || g->b[idx] == 'O') // already occupied?
+    if (g->b[indexrange] == 'X' || g->b[indexrange] == 'O') // already occupied?
     {
         return 0;                           // reject
     }
 
-    g->b[idx] = g->turn;                    // write current player's mark
+    g->b[indexrange] = g->turn;                    // write current player's mark
 
     // switch turn to the other player (expanded if/else version)
     if (g->turn == 'X')
     {
         g->turn = 'O';                      // after X, now O moves
     }
-    else
+    else if(g->turn == 'O')
     {
         g->turn = 'X';                      // after O, now X moves
     }
@@ -80,26 +78,20 @@ void game_check_end(Game *g)
         g->winner = 1;                      // X wins
         return;                             // stop checking
     }
-    else
+    else if (winBy(g->b, 'O'))
     {
-        // if O has a winning line, set winner to 2
-        if (winBy(g->b, 'O'))
+        g->winner = 2;
+        return;
+    }
+    else{
+        if (game_is_full(g))
         {
-            g->winner = 2;                  // O wins
-            return;                         // stop checking
+            g->winner = 3;
+            return;
         }
         else
         {
-            // if no empty cells, it's a draw
-            if (game_is_full(g))
-            {
-                g->winner = 3;              // draw
-                return;                     // stop checking
-            }
-            else
-            {
-                g->winner = 0;              // game still ongoing
-            }
+            g->winner = 0;
         }
     }
 }

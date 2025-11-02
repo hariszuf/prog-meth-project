@@ -63,18 +63,6 @@ static void load_all(StatsAll *all)
                    &all->pvp.games,  &all->pvp.x_wins,  &all->pvp.o_wins,  &all->pvp.draws,
                    &all->pvai.games, &all->pvai.x_wins, &all->pvai.o_wins, &all->pvai.draws);
 
-        // if file only contains 4 numbers (old format), read again for PvAI only
-        if (n != 8)
-        {
-            rewind(f);  // move back to start of file
-
-            (void)fscanf(f, "%d %d %d %d",
-                         &all->pvai.games,
-                         &all->pvai.x_wins,
-                         &all->pvai.o_wins,
-                         &all->pvai.draws);
-        }
-
         // close file after reading
         fclose(f);
     }
@@ -125,9 +113,13 @@ void stats_record_result_mode(StatsMode mode, int winner)
     {
         cat = &all.pvp;     // update Player vs Player
     }
-    else
+    else if (mode == STATS_PVAI)
     {
         cat = &all.pvai;    // update Player vs AI
+    }
+    else
+    {
+        return; // invalid mode
     }
 
     // increase total games played
@@ -139,18 +131,15 @@ void stats_record_result_mode(StatsMode mode, int winner)
         // X wins
         cat->x_wins = cat->x_wins + 1;
     }
+    else if (winner == 2)
+    {
+        // O wins
+        cat->o_wins = cat->o_wins + 1;
+    }
     else
     {
-        if (winner == 2)
-        {
-            // O wins
-            cat->o_wins = cat->o_wins + 1;
-        }
-        else
-        {
-            // draw
-            cat->draws = cat->draws + 1;
-        }
+        // draw
+        cat->draws = cat->draws + 1;
     }
 
     // save updated stats back to file
@@ -174,9 +163,13 @@ void stats_get_counts_mode(StatsMode mode, int *games, int *x_wins, int *o_wins,
     {
         cat = &all.pvp;
     }
-    else
+    else if (mode == STATS_PVAI)
     {
         cat = &all.pvai;
+    }
+    else
+    {
+        return; // invalid mode
     }
 
     // return values to caller (only if pointer is not NULL)
