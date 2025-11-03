@@ -2,18 +2,21 @@
 #include "game.h"            // bring in Game struct and prototypes
 #include "minimax.h"        // AI helper functions
 
-
+static void board_init(char b[9])
+{                                
+    for (int i = 0; i < 9; i++)
+    {
+        b[i] = ' ';   // initialize all to blank
+    }
+}
 
 
 // Public: start a new game 
 void game_init(Game *g)
 {
-    for (int i = 0; i < 9; i++)
-    {
-        g->b[i] = ' ';
-    }
-    g->turn = 'X';
-    g->winner = 0;
+    board_init(g->b);                       // set board to initial digits
+    g->turn = 'X';                          // X always starts first
+    g->winner = 0;                          // no winner at the beginning
 }
 
 // Public: reset game (same behavior as init for simplicity)
