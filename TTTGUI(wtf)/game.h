@@ -21,6 +21,8 @@ int  game_make_move(Game *g, int index); // returns 1 if move made, else 0
 void game_check_end(Game *g);          // sets winner field
 // Load the Naive Bayes model from file
 void game_load_nb_model(const char *model_path); // call once at startup
+// Load the Linear Regression model from file (available but not used)
+// void game_load_lr_model(const char *model_path); // call once at startup
 // Ask AI (playing 'O') to move according to level 1..3
 void game_ai_move(Game *g, int level); // does nothing if not O's turn
 
