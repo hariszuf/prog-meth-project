@@ -5,63 +5,18 @@
 int winBy(char b[9], char p)
 {
     // check all 8 lines (3 rows, 3 cols, 2 diagonals)
-    if (b[0] == p && b[1] == p && b[2] == p)
-    {
-        return 1;
-    }
-    else
-    {
-        if (b[3] == p && b[4] == p && b[5] == p)
-        {
-            return 1;
-        }
-        else
-        {
-            if (b[6] == p && b[7] == p && b[8] == p)
-            {
-                return 1;
-            }
-            else
-            {
-                if (b[0] == p && b[3] == p && b[6] == p)
-                {
-                    return 1;
-                }
-                else
-                {
-                    if (b[1] == p && b[4] == p && b[7] == p)
-                    {
-                        return 1;
-                    }
-                    else
-                    {
-                        if (b[2] == p && b[5] == p && b[8] == p)
-                        {
-                            return 1;
-                        }
-                        else
-                        {
-                            if (b[0] == p && b[4] == p && b[8] == p)
-                            {
-                                return 1;
-                            }
-                            else
-                            {
-                                if (b[2] == p && b[4] == p && b[6] == p)
-                                {
-                                    return 1;
-                                }
-                                else
-                                {
-                                    return 0; // no winning line
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+    if (b[0] == p && b[1] == p && b[2] == p) return 1;
+    if (b[3] == p && b[4] == p && b[5] == p) return 1;
+    if (b[6] == p && b[7] == p && b[8] == p) return 1;
+
+    if (b[0] == p && b[3] == p && b[6] == p) return 1;
+    if (b[1] == p && b[4] == p && b[7] == p) return 1;
+    if (b[2] == p && b[5] == p && b[8] == p) return 1;
+
+    if (b[0] == p && b[4] == p && b[8] == p) return 1;
+    if (b[2] == p && b[4] == p && b[6] == p) return 1;
+
+    return 0; // no winning line
 }
 
 // Helper: return 1 if there is at least one empty cell
