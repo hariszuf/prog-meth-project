@@ -28,34 +28,27 @@ static bool Btn(Rectangle r, const char* label, Color bg, Color fg)
 
     if (hot && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))  // if hovering and clicked
     {
-        return true;                                      // button was clicked
-    }
-    else
-    {
-        return false;                                     // button not clicked
+        return true;
     }
 }
 
 int main(void)
 {
-    const int W = 720;      // window width
-    const int H = 760;      // window height
-    const int CELL = 120;   // size of each grid cell
-    const int OFFX = 50;    // grid x offset from left
+    const int W = 600;      // window width
+    const int H = 720;      // window height
+    const int CELL = 150;   // size of each grid cell
+    const int OFFX = 80;    // grid x offset from left
     const int OFFY = 140;   // grid y offset from top
 
     InitWindow(W, H, "Tic Tac Toe (GUI)");  // create window
     SetTargetFPS(60);                       // limit to 60 fps
     SetRandomSeed((unsigned)time(NULL));    // seed random for AI
 
-    // Load Naive Bayes model for Easy difficulty
-    game_load_nb_model("../models/naive bayes/model.txt");
-
     Game g;           // game state
     game_init(&g);    // initialize game
 
-    int mode = 1;     // game mode: 0=PvP, 1=PvAI
-    int level = 2;    // AI difficulty: 1=Easy (NB), 2=Medium (Minimax), 3=Hard (Full Minimax)
+    int mode = 0;     // game mode: 0=PvP, 1=PvAI
+    int level = 1;    // AI difficulty: 1=Easy, 2=Medium, 3=Hard
     int recorded = 0; // flag to prevent recording stats twice
 
     while (!WindowShouldClose())  // main game loop
@@ -66,8 +59,8 @@ int main(void)
         int font = 20;  // font size
         int padX = 20;  // button padding
         int btnH = 40;  // button height
-        int gap = 10;   // gap between buttons
-        int x = 20;     // current x position for placing buttons
+        int gap = 30;   // gap between buttons
+        int x = 10;     // current x position for placing buttons
         int y = 20;     // y position for buttons
 
         // Calculate button widths based on text
@@ -89,7 +82,7 @@ int main(void)
         Rectangle bH = {(float)x, (float)y, (float)wH, (float)btnH};     // Hard button
 
         // Handle PvP mode button click
-        if (Btn(bPVP, "Player vs Player", (mode == 0 ? GREEN : LIGHTGRAY), BLACK))
+        if (Btn(bPVP, "Player vs Player", (mode == 0 ? BLUE : LIGHTGRAY), BLACK))
         {
             mode = 0;           // switch to PvP mode
             game_reset(&g);     // reset the game
@@ -98,7 +91,7 @@ int main(void)
         }
 
         // Handle PvAI mode button click
-        if (Btn(bAI, "Player vs AI", (mode == 1 ? GREEN : LIGHTGRAY), BLACK))
+        if (Btn(bAI, "Player vs AI", (mode == 1 ? RED : LIGHTGRAY), BLACK))
         {
             mode = 1;           // switch to PvAI mode
             game_reset(&g);     // reset the game
@@ -110,7 +103,7 @@ int main(void)
         if (mode == 1)
         {
             // Easy difficulty button
-            if (Btn(bE, "E", (level == 1 ? ORANGE : LIGHTGRAY), BLACK))
+            if (Btn(bE, "E", (level == 1 ? GREEN : LIGHTGRAY), BLACK))
             {
                 level = 1;          // set difficulty to Easy
                 clickConsumed = true; // mark click as used
@@ -122,7 +115,7 @@ int main(void)
                 clickConsumed = true; // mark click as used
             }
             // Hard difficulty button
-            if (Btn(bH, "H", (level == 3 ? ORANGE : LIGHTGRAY), BLACK))
+            if (Btn(bH, "H", (level == 3 ? RED : LIGHTGRAY), BLACK))
             {
                 level = 3;          // set difficulty to Hard
                 clickConsumed = true; // mark click as used
@@ -201,32 +194,32 @@ int main(void)
         ClearBackground(RAYWHITE);  // clear screen to white
 
         // Display current mode
-        DrawText("Mode:", 20, 70, 20, DARKGRAY);  // label
+        DrawText("Mode:", 90, 70, 20, BLACK);  // label
         if (mode == 0)  // if PvP mode
         {
-            DrawText("Player vs Player", 90, 70, 20, BLACK);  // PvP text
+            DrawText("Player vs Player", 150, 70, 20, BLACK);  // PvP text
         }
         else  // if PvAI mode
         {
-            DrawText("Player vs AI", 90, 70, 20, BLACK);  // PvAI text
+            DrawText("Player vs AI", 150, 70, 20, BLACK);  // PvAI text
         }
 
         // Display difficulty (only in PvAI mode)
         if (mode == 1)
         {
-            DrawText("Difficulty:", 270, 70, 20, DARKGRAY);  // label
+            DrawText("Difficulty:", 400, 70, 20, BLACK);  // label
             
             if (level == 1)  // if Easy
             {
-                DrawText("Easy (Naive Bayes)", 380, 70, 20, BLACK);  // draw Easy
+                DrawText("Easy", 500, 70, 20, BLACK);  // draw Easy
             }
             else if (level == 2)  // if Medium
             {
-                DrawText("Medium (Minimax)", 380, 70, 20, BLACK);  // draw Medium
+                DrawText("Medium", 500, 70, 20, BLACK);  // draw Medium
             }
             else  // if Hard
             {
-                DrawText("Hard (Full Minimax)", 380, 70, 20, BLACK);  // draw Hard
+                DrawText("Hard", 500, 70, 20, BLACK);  // draw Hard
             }
         }
 
@@ -301,20 +294,20 @@ int main(void)
         }
 
         // Draw player labels
-        DrawText("Player 1: X", 20, 100, 20, DARKGRAY);  // X label
+        DrawText("Player 1: X", 90, 100, 20, BLACK);  // X label
         if (mode == 0)  // if PvP mode
         {
-            DrawText("Player 2: O", 170, 100, 20, DARKGRAY);  // Player 2 label
+            DrawText("Player 2: O", 400, 100, 20, BLACK);  // Player 2 label
         }
         else  // if PvAI mode
         {
-            DrawText("AI: O", 170, 100, 20, DARKGRAY);  // AI label
+            DrawText("AI: O", 400, 100, 20, BLACK);  // AI label
         }
 
         // Draw status message
         DrawText(status, 20, OFFY + 3 * CELL + 20, 24, BLACK);  // main status
         DrawText("Click cells to play. Press R to reset. ESC to quit.",
-                 20, OFFY + 3 * CELL + 56, 18, GRAY);  // help text
+                 28, OFFY + 3 * CELL + 56, 22, DARKGRAY);  // help text
 
         // Draw scoreboard
         int games, xw, ow, dr;  // variables for stats
@@ -340,7 +333,7 @@ int main(void)
                      games, xw, ow, dr);  // format PvAI scoreboard
         }
         
-        DrawText(line, 20, OFFY + 3 * CELL + 90, 20, DARKBLUE);  // draw scoreboard
+        DrawText(line, 28, OFFY + 3 * CELL + 90, 20, DARKBLUE);  // draw scoreboard
 
         EndDrawing();  // finish drawing this frame
     }
