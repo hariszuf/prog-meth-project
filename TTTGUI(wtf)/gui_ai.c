@@ -48,11 +48,14 @@ int main(void)
     SetTargetFPS(60);                       // limit to 60 fps
     SetRandomSeed((unsigned)time(NULL));    // seed random for AI
 
+    // Load Naive Bayes model for Easy difficulty
+    game_load_nb_model("../models/naive bayes/model.txt");
+
     Game g;           // game state
     game_init(&g);    // initialize game
 
     int mode = 1;     // game mode: 0=PvP, 1=PvAI
-    int level = 2;    // AI difficulty: 1=Easy, 2=Medium, 3=Hard
+    int level = 2;    // AI difficulty: 1=Easy (NB), 2=Medium (Minimax), 3=Hard (Full Minimax)
     int recorded = 0; // flag to prevent recording stats twice
 
     while (!WindowShouldClose())  // main game loop
@@ -215,15 +218,15 @@ int main(void)
             
             if (level == 1)  // if Easy
             {
-                DrawText("Easy", 380, 70, 20, BLACK);  // draw Easy
+                DrawText("Easy (Naive Bayes)", 380, 70, 20, BLACK);  // draw Easy
             }
             else if (level == 2)  // if Medium
             {
-                DrawText("Medium", 380, 70, 20, BLACK);  // draw Medium
+                DrawText("Medium (Minimax)", 380, 70, 20, BLACK);  // draw Medium
             }
             else  // if Hard
             {
-                DrawText("Hard", 380, 70, 20, BLACK);  // draw Hard
+                DrawText("Hard (Full Minimax)", 380, 70, 20, BLACK);  // draw Hard
             }
         }
 

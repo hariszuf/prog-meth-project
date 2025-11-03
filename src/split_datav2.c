@@ -11,7 +11,7 @@
 // Structure to hold a single data sample
 typedef struct {
     char features[FEATURES];  // 'x', 'o', or 'b' for each square
-    char outcome;             // 'p' for positive (win), 'n' for negative (lose)
+    char outcome;             // 'w' for win, 'l' for lose, 'd' for draw
 } Sample;
 
 // Structure to hold the dataset
@@ -73,10 +73,12 @@ int readDataset(const char *filename, Dataset *dataset) {
         
         // Read the outcome (last token)
         if (token != NULL) {
-            if (strcmp(token, "positive") == 0) {
-                dataset->data[dataset->size].outcome = 'p';
-            } else if (strcmp(token, "negative") == 0) {
-                dataset->data[dataset->size].outcome = 'n';
+            if (strcmp(token, "win") == 0) {
+                dataset->data[dataset->size].outcome = 'w';
+            } else if (strcmp(token, "lose") == 0) {
+                dataset->data[dataset->size].outcome = 'l';
+            } else if (strcmp(token, "draw") == 0) {
+                dataset->data[dataset->size].outcome = 'd';
             }
             dataset->size++;
         }
@@ -133,7 +135,8 @@ void displayBoard(Sample *s) {
             printf("|");
         }
     }
-    printf("Outcome: %s\n\n", s->outcome == 'p' ? "Positive (Win)" : "Negative (Lose)");
+    printf("Outcome: %s\n\n", 
+           s->outcome == 'w' ? "Win" : (s->outcome == 'l' ? "Lose" : "Draw"));
 }
 
 // Function to save dataset to file
@@ -151,7 +154,9 @@ int saveDataset(const char *filename, Dataset *dataset) {
             if (j < FEATURES - 1) fprintf(fp, ",");
         }
         // Write outcome
-        fprintf(fp, ",%s\n", dataset->data[i].outcome == 'p' ? "positive" : "negative");
+        fprintf(fp, ",%s\n", 
+                dataset->data[i].outcome == 'w' ? "win" : 
+                (dataset->data[i].outcome == 'l' ? "lose" : "draw"));
     }
     
     fclose(fp);
@@ -168,24 +173,27 @@ int saveReport(const char *filename, Dataset *full, Dataset *train, Dataset *tes
     }
     
     // Count outcomes in full dataset
-    int full_positive = 0, full_negative = 0;
+    int full_win = 0, full_lose = 0, full_draw = 0;
     for (int i = 0; i < full->size; i++) {
-        if (full->data[i].outcome == 'p') full_positive++;
-        else full_negative++;
+        if (full->data[i].outcome == 'w') full_win++;
+        else if (full->data[i].outcome == 'l') full_lose++;
+        else if (full->data[i].outcome == 'd') full_draw++;
     }
     
     // Count outcomes in training set
-    int train_positive = 0, train_negative = 0;
+    int train_win = 0, train_lose = 0, train_draw = 0;
     for (int i = 0; i < train->size; i++) {
-        if (train->data[i].outcome == 'p') train_positive++;
-        else train_negative++;
+        if (train->data[i].outcome == 'w') train_win++;
+        else if (train->data[i].outcome == 'l') train_lose++;
+        else if (train->data[i].outcome == 'd') train_draw++;
     }
     
     // Count outcomes in testing set
-    int test_positive = 0, test_negative = 0;
+    int test_win = 0, test_lose = 0, test_draw = 0;
     for (int i = 0; i < test->size; i++) {
-        if (test->data[i].outcome == 'p') test_positive++;
-        else test_negative++;
+        if (test->data[i].outcome == 'w') test_win++;
+        else if (test->data[i].outcome == 'l') test_lose++;
+        else if (test->data[i].outcome == 'd') test_draw++;
     }
     
     // Write report
@@ -196,35 +204,41 @@ int saveReport(const char *filename, Dataset *full, Dataset *train, Dataset *tes
     fprintf(fp, "FULL DATASET STATISTICS\n");
     fprintf(fp, "----------------------------------------\n");
     fprintf(fp, "Total samples: %d\n", full->size);
-    fprintf(fp, "Positive outcomes (X wins): %d (%.2f%%)\n", 
-            full_positive, (full_positive * 100.0) / full->size);
-    fprintf(fp, "Negative outcomes (X loses): %d (%.2f%%)\n\n", 
-            full_negative, (full_negative * 100.0) / full->size);
+    fprintf(fp, "Win outcomes: %d (%.2f%%)\n", 
+            full_win, (full_win * 100.0) / full->size);
+    fprintf(fp, "Lose outcomes: %d (%.2f%%)\n", 
+            full_lose, (full_lose * 100.0) / full->size);
+    fprintf(fp, "Draw outcomes: %d (%.2f%%)\n\n", 
+            full_draw, (full_draw * 100.0) / full->size);
     
     fprintf(fp, "TRAINING SET STATISTICS\n");
     fprintf(fp, "----------------------------------------\n");
     fprintf(fp, "Total samples: %d (%.2f%% of full dataset)\n", 
             train->size, (train->size * 100.0) / full->size);
-    fprintf(fp, "Positive outcomes: %d (%.2f%%)\n", 
-            train_positive, (train_positive * 100.0) / train->size);
-    fprintf(fp, "Negative outcomes: %d (%.2f%%)\n\n", 
-            train_negative, (train_negative * 100.0) / train->size);
+    fprintf(fp, "Win outcomes: %d (%.2f%%)\n", 
+            train_win, (train_win * 100.0) / train->size);
+    fprintf(fp, "Lose outcomes: %d (%.2f%%)\n", 
+            train_lose, (train_lose * 100.0) / train->size);
+    fprintf(fp, "Draw outcomes: %d (%.2f%%)\n\n", 
+            train_draw, (train_draw * 100.0) / train->size);
     
     fprintf(fp, "TESTING SET STATISTICS\n");
     fprintf(fp, "----------------------------------------\n");
     fprintf(fp, "Total samples: %d (%.2f%% of full dataset)\n", 
             test->size, (test->size * 100.0) / full->size);
-    fprintf(fp, "Positive outcomes: %d (%.2f%%)\n", 
-            test_positive, (test_positive * 100.0) / test->size);
-    fprintf(fp, "Negative outcomes: %d (%.2f%%)\n\n", 
-            test_negative, (test_negative * 100.0) / test->size);
+    fprintf(fp, "Win outcomes: %d (%.2f%%)\n", 
+            test_win, (test_win * 100.0) / test->size);
+    fprintf(fp, "Lose outcomes: %d (%.2f%%)\n", 
+            test_lose, (test_lose * 100.0) / test->size);
+    fprintf(fp, "Draw outcomes: %d (%.2f%%)\n\n", 
+            test_draw, (test_draw * 100.0) / test->size);
     
     fprintf(fp, "DATA SPLIT CONFIGURATION\n");
     fprintf(fp, "----------------------------------------\n");
     fprintf(fp, "Training/Testing split: 80/20\n");
     fprintf(fp, "Features per sample: %d\n", FEATURES);
     fprintf(fp, "Feature encoding: x (X player), o (O player), b (blank)\n");
-    fprintf(fp, "Target variable: positive (X wins), negative (X loses/draws)\n");
+    fprintf(fp, "Target variable: win, lose, draw (3 classes)\n");
     fprintf(fp, "Shuffling: YES (Random seed based on system time)\n\n");
     
     fprintf(fp, "OUTPUT FILES\n");
@@ -252,11 +266,11 @@ int main() {
     
     // a) Read the dataset file
     printf("========================================\n");
-    printf("TIC-TAC-TOE DATASET PROCESSOR\n");
+    printf("TIC-TAC-TOE DATASET PROCESSOR (3-CLASS)\n");
     printf("========================================\n\n");
     
-    printf("Reading dataset from tic-tac-toe.data...\n");
-    if (!readDataset("tic-tac-toe.data", &fullDataset)) {
+    printf("Reading dataset from tic-tac-toe-3class.data...\n");
+    if (!readDataset("tic-tac-toe-3class.data", &fullDataset)) {
         return 1;
     }
     
