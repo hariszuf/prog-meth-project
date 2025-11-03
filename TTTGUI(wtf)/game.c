@@ -1,6 +1,11 @@
 // game.c — game engine implementation (no printing here)
 #include "game.h"            // bring in Game struct and prototypes
 #include "minimax.h"        // AI helper functions
+#include "naive_bayes_ai.h" // Naive Bayes AI
+
+// Global Naive Bayes model (loaded once at startup)
+static NaiveBayesModel nb_model;
+static int nb_model_loaded = 0;
 
 void game_init(Game *g)
 {
@@ -79,6 +84,16 @@ void game_check_end(Game *g) {
 }
 
 
+// Load the Naive Bayes model (call this once at startup)
+void game_load_nb_model(const char *model_path)
+{
+    if (!nb_model_loaded) {
+        if (nb_load_model(model_path, &nb_model)) {
+            nb_model_loaded = 1;
+        }
+    }
+}
+
 // Public: if it's O's turn, ask AI to play based on level (1..3)
 void game_ai_move(Game *g, int level)
 {
@@ -88,7 +103,28 @@ void game_ai_move(Game *g, int level)
         return;                             // do nothing
     }
 
-    int mv = findBestMoveLvl(g->b, level);      // try AI to find index (0..8) or -1
+    int mv = -1;
+
+    // Level 1 = Easy = Naive Bayes AI
+    if (level == 1 && nb_model_loaded)
+    {
+        mv = nb_find_best_move(&nb_model, g->b);
+    }
+    // Level 2 = Medium = Minimax with depth limit (original level 2)
+    else if (level == 2)
+    {
+        mv = findBestMoveLvl(g->b, 2);
+    }
+    // Level 3 = Hard = Full Minimax (original level 3)
+    else if (level == 3)
+    {
+        mv = findBestMoveLvl(g->b, 3);
+    }
+    else
+    {
+        // Fallback to original minimax if Naive Bayes not loaded
+        mv = findBestMoveLvl(g->b, level);
+    }
 
     // If AI returned a valid empty cell, use it
     if (mv >= 0 && mv < 9 && g->b[mv] != 'X' && g->b[mv] != 'O')
