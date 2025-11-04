@@ -2,14 +2,10 @@
 #include "game.h"            // bring in Game struct and prototypes
 #include "minimax.h"        // AI helper functions
 #include "naive_bayes_ai.h" // Naive Bayes AI
-// #include "linear_regression_ai.h" // Linear Regression AI (available for future use)
 
 // Global AI models (loaded once at startup)
 static NaiveBayesModel nb_model;
 static int nb_model_loaded = 0;
-// Linear Regression model available but not loaded
-// static LinearRegressionModel lr_model;
-// static int lr_model_loaded = 0;
 
 void game_init(Game *g)
 {
@@ -63,7 +59,7 @@ int game_make_move(Game *g, int index)
     {
         g->turn = 'O';                      // after X, now O moves
     }
-    else 
+    else
     {
         g->turn = 'X';                      // after O, now X moves
     }
@@ -97,19 +93,6 @@ void game_load_nb_model(const char *model_path)
         }
     }
 }
-
-// Load the Linear Regression model (call this once at startup)
-// Commented out - available for future use
-/*
-void game_load_lr_model(const char *model_path)
-{
-    if (!lr_model_loaded) {
-        if (lr_load_model(model_path, &lr_model)) {
-            lr_model_loaded = 1;
-        }
-    }
-}
-*/
 
 // Public: if it's O's turn, ask AI to play based on level (1..3)
 void game_ai_move(Game *g, int level)
