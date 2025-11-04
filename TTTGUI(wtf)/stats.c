@@ -9,8 +9,10 @@
 void stats_log_ai_move(int mode, int level, int move_no, double ms)
 {
     FILE *f = fopen(AI_TIME_FILE, "a");
-    if (!f) return;
-
+    if (!f) {
+        return;
+    }
+    
     time_t now = time(NULL);
     struct tm *lt = localtime(&now);
     char ts[32];

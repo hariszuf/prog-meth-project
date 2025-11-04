@@ -6,6 +6,8 @@
 #include "game.h"       // game logic functions
 #include "stats.h"      // statistics tracking
 
+
+
 // Button helper: draws button and returns true if clicked
 static bool Btn(Rectangle r, const char* label, Color bg, Color fg)
 {

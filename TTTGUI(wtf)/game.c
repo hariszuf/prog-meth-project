@@ -63,7 +63,7 @@ int game_make_move(Game *g, int index)
     {
         g->turn = 'O';                      // after X, now O moves
     }
-    else
+    else 
     {
         g->turn = 'X';                      // after O, now X moves
     }
