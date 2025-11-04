@@ -18,11 +18,31 @@ void stats_log_ai_move(int mode, int level, int move_no, double ms)
 
     // Example line:
     // 2025-11-04 09:32:18, mode=PVAI, level=2, move=7, ms=4.317
-    fprintf(f, "%s, mode=%s, level=%d, move=%d, ms=%.3f\n",
-            ts, (mode==0 ? "PVP" : "PVAI"), level, move_no, ms);
+    const char *levelmode;  // use pointer to string
 
-    fclose(f);
-}
+    if (level == 1)
+    {
+        levelmode = "Easy";
+    }
+    else if (level == 2)
+    {
+        levelmode = "Medium";
+    }
+    else if (level == 3)
+    {
+        levelmode = "Hard";
+    }
+    else
+    {
+        levelmode = "Unknown";
+    }
+
+    fprintf(f, "%s, mode=%s, level=%s, move=%d, ms=%.3f\n",
+            ts, (mode == 0 ? "PVP" : "PVAI"), levelmode, move_no, ms);
+
+
+        fclose(f);
+    }
 // Each category (PvP or PvAI) keeps total games, wins for X, wins for O, and draws
 typedef struct {
     int games;      // total number of games played
