@@ -1,8 +1,4 @@
-2025-11-04 10:32:57, mode=PVAI, level=1, move=1, ms=0.004
-2025-11-04 10:32:58, mode=PVAI, level=1, move=2, ms=0.003
-2025-11-04 10:32:59, mode=PVAI, level=1, move=3, ms=0.004
-2025-11-04 10:33:00, mode=PVAI, level=1, move=4, ms=0.002
-2025-11-04 10:33:03, mode=PVAI, level=1, move=1, ms=0.006
-2025-11-04 10:33:04, mode=PVAI, level=1, move=2, ms=0.006
-2025-11-04 10:33:05, mode=PVAI, level=1, move=3, ms=0.004
-2025-11-04 10:33:05, mode=PVAI, level=1, move=4, ms=0.002
+2025-11-04 10:41:00, mode=PVAI, level=2, move=1, ms=0.070
+2025-11-04 10:41:00, mode=PVAI, level=2, move=2, ms=0.021
+2025-11-04 10:41:01, mode=PVAI, level=2, move=3, ms=0.008
+2025-11-04 10:41:02, mode=PVAI, level=2, move=4, ms=0.004
