@@ -173,3 +173,38 @@ void stats_get_counts_mode(StatsMode mode, int *games, int *x_wins, int *o_wins,
         *draws = cat->draws;
     }
 }
+
+void stats_reset_pvp(void)
+{
+    FILE *f = fopen(STATS_FILE, "r");
+    int pvp_g, pvp_x, pvp_o, pvp_d;
+    int ai_g, ai_x, ai_o, ai_d;
+
+    // If file exists, read current stats
+    if (f)
+    {
+        fscanf(f, "%d %d %d %d %d %d %d %d",
+               &pvp_g, &pvp_x, &pvp_o, &pvp_d,
+               &ai_g, &ai_x, &ai_o, &ai_d);
+        fclose(f);
+    }
+    else
+    {
+        // If no file, initialize to 0
+        pvp_g = pvp_x = pvp_o = pvp_d = 0;
+        ai_g = ai_x = ai_o = ai_d = 0;
+    }
+
+    // Reset PvP only
+    pvp_g = pvp_x = pvp_o = pvp_d = 0;
+
+    // Write updated stats back
+    f = fopen(STATS_FILE, "w");
+    if (f)
+    {
+        fprintf(f, "%d %d %d %d %d %d %d %d\n",
+                pvp_g, pvp_x, pvp_o, pvp_d,
+                ai_g, ai_x, ai_o, ai_d);
+        fclose(f);
+    }
+}

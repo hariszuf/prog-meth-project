@@ -15,4 +15,5 @@ void stats_record_result_mode(StatsMode mode, int winner);
 // Read the counts back (any pointer may be NULL if caller does not need it)
 void stats_get_counts_mode(StatsMode mode,int *games,int *x_wins,int *o_wins,int *draws);
 
+void stats_reset_pvp(void);
 #endif // STATS_H
