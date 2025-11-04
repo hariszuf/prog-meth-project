@@ -16,4 +16,8 @@ void stats_record_result_mode(StatsMode mode, int winner);
 void stats_get_counts_mode(StatsMode mode,int *games,int *x_wins,int *o_wins,int *draws);
 
 void stats_reset_pvp(void);
+
+// stats.h
+void stats_log_ai_move(int mode, int level, int move_no, double ms);
+
 #endif // STATS_H

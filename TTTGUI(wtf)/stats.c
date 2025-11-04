@@ -1,10 +1,28 @@
 // stats.c — keeps separate statistics for PvP and PvAI
 #include <stdio.h>      // for file operations: fopen, fscanf, fprintf, fclose
 #include "stats.h"      // include our own header for function prototypes and enums
-
+#include <time.h>
 // File name to store all statistics
 #define STATS_FILE "tictactoe_stats.txt"
+#define AI_TIME_FILE "ai_timing.txt"
 
+void stats_log_ai_move(int mode, int level, int move_no, double ms)
+{
+    FILE *f = fopen(AI_TIME_FILE, "a");
+    if (!f) return;
+
+    time_t now = time(NULL);
+    struct tm *lt = localtime(&now);
+    char ts[32];
+    strftime(ts, sizeof ts, "%Y-%m-%d %H:%M:%S", lt);
+
+    // Example line:
+    // 2025-11-04 09:32:18, mode=PVAI, level=2, move=7, ms=4.317
+    fprintf(f, "%s, mode=%s, level=%d, move=%d, ms=%.3f\n",
+            ts, (mode==0 ? "PVP" : "PVAI"), level, move_no, ms);
+
+    fclose(f);
+}
 // Each category (PvP or PvAI) keeps total games, wins for X, wins for O, and draws
 typedef struct {
     int games;      // total number of games played

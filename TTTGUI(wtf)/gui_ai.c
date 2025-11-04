@@ -43,7 +43,7 @@ int main(void)
     int mode = 0;     // game mode: 0=PvP, 1=PvAI
     int level = 1;    // AI difficulty: 1=Easy, 2=Medium, 3=Hard
     int recorded = 0; // flag to prevent recording stats twice
-
+    int ai_move_no = 0;
     while (!WindowShouldClose())  // main game loop
     {
         bool clickConsumed = false; // track if click was used by UI
@@ -92,19 +92,21 @@ int main(void)
         // Handle PvP mode button click
         if (Btn(bPVP, "Player vs Player", (mode == 0 ? BLUE : LIGHTGRAY), BLACK))
         {
-            mode = 0;           // switch to PvP mode
-            game_reset(&g);     // reset the game
-            recorded = 0;       // clear stats recording flag
-            clickConsumed = true; // mark click as used
+            mode = 0;
+            game_reset(&g);
+            recorded = 0;
+            ai_move_no = 0; // reset AI move counter
+            clickConsumed = true;
         }
 
         // Handle PvAI mode button click
         if (Btn(bAI, "Player vs AI", (mode == 1 ? RED : LIGHTGRAY), BLACK))
         {
-            mode = 1;           // switch to PvAI mode
-            game_reset(&g);     // reset the game
-            recorded = 0;       // clear stats recording flag
-            clickConsumed = true; // mark click as used
+            mode = 1;
+            game_reset(&g);
+            recorded = 0;
+            ai_move_no = 0; // reset AI move counter
+            clickConsumed = true;
         }
 
         // Show difficulty buttons only in PvAI mode
@@ -135,8 +137,9 @@ int main(void)
         // Handle R key press to reset game
         if (IsKeyPressed(KEY_R))
         {
-            game_reset(&g);  // reset the game
-            recorded = 0;    // clear stats recording flag
+            game_reset(&g);
+            recorded = 0;
+            ai_move_no = 0; // reset AI move counter
         }
 
         // Handle board clicks (only if UI didn't consume click, game not over, and mouse clicked)
@@ -169,8 +172,15 @@ int main(void)
         // AI turn: if PvAI mode, game not over, and it's O's turn
         if (mode == 1 && g.winner == 0 && g.turn == 'O')
         {
-            game_ai_move(&g, level);  // AI makes a move
-            game_check_end(&g);       // check if game ended
+            double t0 = GetTime();                 // start timer (seconds)
+            game_ai_move(&g, level);               // AI makes a move
+            double t1 = GetTime();                 // end timer
+            double ms = (t1 - t0) * 1000.0;        // duration in milliseconds
+
+            ai_move_no++;                          // increment AI move counter
+            stats_log_ai_move(mode, level, ai_move_no, ms);  // append to file
+
+            game_check_end(&g);                    // check if game ended
         }
 
         // Record statistics once per game when game ends
