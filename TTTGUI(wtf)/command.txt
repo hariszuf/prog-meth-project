@@ -6,3 +6,7 @@ gcc gui_ai.c game.c minimax.c naive_bayes_ai.c stats.c -o ttt_gui -I "C:\raylib\
 gcc gui_ai.c game.c stats.c minimax.c naive_bayes_ai.c -o ttt_gui.exe  -I"C:\raylib\raylib\src" -L"C:\raylib\raylib\src" -lraylib -lopengl32 -lgdi32 -lwinmm -luser32 -lshell32 -lws2_32
 
 # Linear Regression available: add linear_regression_ai.c to enable
+
+
+# for MM dataset
+gcc .\dataset_MM.c .\minimax.c -o gen_dataset.exe
