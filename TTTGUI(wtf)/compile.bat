@@ -18,9 +18,6 @@ gcc -o ttt_gui.exe ^
     -lraylib -lopengl32 -lgdi32 -lwinmm -luser32 -lshell32 -lws2_32 ^
     -Wall
 
-REM Linear Regression AI available but not compiled in
-REM Add linear_regression_ai.c to compile list to enable
-
 if %ERRORLEVEL% EQU 0 (
     echo.
     echo Compilation successful! Run ttt_gui.exe to play.
