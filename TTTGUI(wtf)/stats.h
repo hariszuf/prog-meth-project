@@ -10,10 +10,11 @@ typedef enum {
 
 // Record the result of one finished game in the given mode
 // winner: 1 = X won, 2 = O won, 0 = draw
-void stats_record_result_mode(StatsMode mode, int winner);
+void stats_record_result_mode(StatsMode mode, int level, int winner);
 
 // Read the counts back (any pointer may be NULL if caller does not need it)
-void stats_get_counts_mode(StatsMode mode,int *games,int *x_wins,int *o_wins,int *draws);
+void stats_get_counts_mode(StatsMode mode, int level,
+                           int *games, int *x_wins, int *o_wins, int *draws);
 
 void stats_reset_pvp(void);
 

@@ -203,14 +203,16 @@ int main(void)
                 code = 0;  // draw code
             }
 
-            if (mode == 0)  // if PvP mode
-            {
-                stats_record_result_mode(STATS_PVP, code);  // record PvP stats
-            }
-            else  // if PvAI mode
-            {
-                stats_record_result_mode(STATS_PVAI, code);  // record PvAI stats
-            }
+        if (mode == STATS_PVP)
+        {
+            // No AI level for PvP, use 0
+            stats_record_result_mode(STATS_PVP, 0, code);
+        }
+        else if (mode == STATS_PVAI)
+        {
+            // Use actual AI difficulty level (1=Easy, 2=Medium, 3=Hard)
+            stats_record_result_mode(STATS_PVAI, level, code);
+        }
             
             recorded = 1;  // mark as recorded
         }
@@ -360,13 +362,14 @@ int main(void)
         // Draw scoreboard
         int games, xw, ow, dr;  // variables for stats
         
-        if (mode == 0)  // if PvP mode
+        // Display PvP stats
+        if (mode == 0)  // PvP mode
         {
-            stats_get_counts_mode(STATS_PVP, &games, &xw, &ow, &dr);  // get PvP stats
+            stats_get_counts_mode(STATS_PVP, 0, &games, &xw, &ow, &dr);  // get PvP stats
         }
-        else  // if PvAI mode
+        else if (mode == 1)  // PvAI mode
         {
-            stats_get_counts_mode(STATS_PVAI, &games, &xw, &ow, &dr);  // get PvAI stats
+            stats_get_counts_mode(STATS_PVAI, level, &games, &xw, &ow, &dr);  // get PvAI stats
         }
 
         char line[256];  // buffer for scoreboard text
