@@ -15,7 +15,7 @@ gcc -o ttt_gui.exe ^
     stats.c ^
     -I"C:\raylib\raylib\src" ^
     -L"C:\raylib\raylib\src" ^
-    -lraylib -lopengl32 -lgdi32 -lwinmm -luser32 -lshell32 -lws2_32 ^
+    -lraylib -lopengl32 -lgdi32 -lwinmm -luser32 -lshell32 -lws2_32 -lpsapi ^
     -Wall
 
 if %ERRORLEVEL% EQU 0 (
