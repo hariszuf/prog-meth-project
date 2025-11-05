@@ -87,7 +87,7 @@ int main(void)
         }
 
         // Define Reset PvP Stats button — always created, only visible in PvP
-// Define Reset PvP Stats button (smaller and compact)
+        // Define Reset PvP Stats button (smaller and compact)
         int wReset = MeasureText("Reset", font) + 10;      // shorter label and narrower width
         Rectangle bResetPvP = { (float)(xAfterModeButtons + 5), (float)(y + 50), (float)wReset, (float)(btnH - 10) };
 
@@ -294,7 +294,7 @@ int main(void)
             int thick = 4; // thickness of O circle
             for (int t = 0; t < thick; t++)
             {
-                DrawCircleLines(cx, cy, 38 - t, BLUE); // draw multiple rings to thicken
+                DrawCircleLines(cx, cy, 40 - t, BLUE); // draw multiple rings to thicken
             }
         }
 
@@ -344,10 +344,10 @@ int main(void)
         }
 
         // Draw player labels
-        DrawText("Player 1: X", 90, 100, 20, BLACK);  // X label
+        DrawText("Player 1: X", 90, 100, 20, RED);  // X label
         if (mode == 0)  // if PvP mode
         {
-            DrawText("Player 2: O", 400, 100, 20, BLACK);  // Player 2 label
+            DrawText("Player 2: O", 400, 100, 20, BLUE);  // Player 2 label
         }
         else  // if PvAI mode
         {
@@ -355,7 +355,35 @@ int main(void)
         }
 
         // Draw status message
-        DrawText(status, 20, OFFY + 3 * CELL + 20, 24, BLACK);  // main status
+        int fontSize = 24;
+
+        // Choose text color based on the message
+        Color statusColor = BLACK; // default
+
+        if (g.winner == 0)  // game still running
+        {
+            if (g.turn == 'X')
+                statusColor = RED;      // Player 1’s turn → red
+            else if (g.turn == 'O')
+                statusColor = BLUE;     // Player 2 or AI’s turn → blue
+        }
+        else  // game finished
+        {
+            if (g.winner == 1)
+                statusColor = RED;      // X won → red
+            else if (g.winner == 2)
+                statusColor = BLUE;     // O or AI won → blue
+            else
+                statusColor = DARKGRAY; // draw
+        }
+
+// Center the text horizontally
+int textWidth = MeasureText(status, fontSize);
+int centerX = (W - textWidth) / 2;
+
+// Draw the colored text
+DrawText(status, centerX, OFFY + 3 * CELL + 20, fontSize, statusColor);
+
         DrawText("Click cells to play. Press R to reset. ESC to quit.",
                 28, OFFY + 3 * CELL + 56, 22, DARKGRAY);  // help text
 
@@ -384,7 +412,16 @@ int main(void)
                     games, xw, ow, dr);  // format PvAI scoreboard
         }
         
-        DrawText(line, 28, OFFY + 3 * CELL + 90, 20, DARKBLUE);  // draw scoreboard
+        int scoreFont = 20;
+        int scoreY = OFFY + 3 * CELL + 90;  // same height as before
+
+        // Measure text width to center horizontally
+        int scoreWidth = MeasureText(line, scoreFont);
+        int scoreX = (W - scoreWidth) / 2;  // center horizontally in window
+
+        // Draw centered scoreboard
+        DrawText(line, scoreX, scoreY, scoreFont, DARKBLUE);
+
         // Draw and handle Reset PvP Stats button beside the scoreboard
         // Draw and handle Reset PvP Stats button beside the scoreboard
         if (mode == 0)  // only show in PvP mode
@@ -394,7 +431,7 @@ int main(void)
             int resetH = 28;     // height of button
 
             // Position the button beside the scoreboard (next to "Draw:0")
-            int resetX = 28 + MeasureText(line, 20) + 15;  // 15px gap after scoreboard text
+            int resetX = 28 + MeasureText(line, 20) + 100;  // 70px gap after scoreboard text
             int resetY = OFFY + 3 * CELL + 85;             // vertically align with scoreboard
 
             Rectangle bResetPvP = { (float)resetX, (float)resetY, (float)resetW, (float)resetH };
