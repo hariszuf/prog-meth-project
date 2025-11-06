@@ -39,6 +39,12 @@ int main(void)
     SetTargetFPS(60);                       // limit to 60 fps
     SetRandomSeed((unsigned)time(NULL));    // seed random for AI
 
+    InitAudioDevice(); // Initialize audio
+
+    Sound winSound = LoadSound("audio/win.mp3");
+    Sound loseSound = LoadSound("audio/lose.mp3");
+
+
     Game g;           // game state
     game_init(&g);    // initialize game
 
@@ -215,6 +221,20 @@ int main(void)
         }
             
             recorded = 1;  // mark as recorded
+            if (mode == 0)  // PvP mode
+            {
+                if (g.winner == 1 || g.winner == 2)
+                    PlaySound(winSound);
+            }
+            else if (mode == 1)  // PvAI mode
+            {
+                if (g.winner == 1)
+                    PlaySound(winSound);   // You win
+                else if (g.winner == 2)
+                    PlaySound(loseSound);  // AI wins
+            }
+
+
         }
 
         // Start drawing this frame
@@ -462,6 +482,9 @@ DrawText(status, centerX, OFFY + 3 * CELL + 20, fontSize, statusColor);
 
         EndDrawing();  // finish drawing this frame
     }
+    UnloadSound(winSound);
+    UnloadSound(loseSound);
+    CloseAudioDevice();
 
     CloseWindow();  // close window and cleanup
     return 0;       // exit program
