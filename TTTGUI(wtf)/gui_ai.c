@@ -3,12 +3,12 @@
 #include <string.h>     // for strcpy
 #include <time.h>       // for time() to seed random
 #include <stdio.h>      // for snprintf
-#include "game.h"       // game logic functions
-#include "stats.h"      // statistics tracking
+#include "game.h"       // game file
+#include "stats.h"      // stats file
 
 
 
-// Button helper: draws button and returns true if clicked
+//Button function: draws button and returns true if clicked
 static bool Btn(Rectangle r, const char* label, Color bg, Color fg)
 {
     Vector2 m = GetMousePosition();
@@ -36,7 +36,7 @@ int main(void)
     const int OFFY = 140;   // grid y offset from top
 
     InitWindow(W, H, "Tic Tac Toe (GUI)");  // create window
-    SetTargetFPS(60);                       // limit to 60 fps
+    SetTargetFPS(60);                       
     SetRandomSeed((unsigned)time(NULL));    // seed random for AI
 
     InitAudioDevice(); // Initialize audio
@@ -48,8 +48,8 @@ int main(void)
     Game g;           // game state
     game_init(&g);    // initialize game
 
-    int mode = 0;     // game mode: 0=PvP, 1=PvAI
-    int level = 1;    // AI difficulty: 1=Easy, 2=Medium, 3=Hard
+    int mode = 0;     // set default game mode: 0=PvP, 1=PvAI
+    int level = 1;    // set default AI difficulty: 1=Easy, 2=Medium, 3=Hard
     int recorded = 0; // flag to prevent recording stats twice
     int ai_move_no = 0;
     while (!WindowShouldClose())  // main game loop
@@ -239,7 +239,7 @@ int main(void)
 
         // Start drawing this frame
         BeginDrawing();
-        ClearBackground(RAYWHITE);  // clear screen to white
+        ClearBackground(RAYWHITE);  // set background to white
 
         // Display current mode
         DrawText("Mode:", 90, 70, 20, BLACK);  // label
@@ -257,15 +257,15 @@ int main(void)
         {
             DrawText("Difficulty:", 400, 70, 20, BLACK);  // label
             
-            if (level == 1)  // if Easy
+            if (level == 1)  // Easy Mode
             {
                 DrawText("Easy", 500, 70, 20, GREEN);  // draw Easy
             }
-            else if (level == 2)  // if Medium
+            else if (level == 2)  // Medium mode
             {
                 DrawText("Medium", 500, 70, 20, ORANGE);  // draw Medium
             }
-            else  // if Hard
+            else  // Hard mode
             {
                 DrawText("Hard", 500, 70, 20, RED);  // draw Hard
             }
@@ -486,6 +486,6 @@ DrawText(status, centerX, OFFY + 3 * CELL + 20, fontSize, statusColor);
     UnloadSound(loseSound);
     CloseAudioDevice();
 
-    CloseWindow();  // close window and cleanup
-    return 0;       // exit program
+    CloseWindow();
+    return 0;
 }
