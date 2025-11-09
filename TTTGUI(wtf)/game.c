@@ -1,11 +1,23 @@
 // game.c — game engine implementation (no printing here)
 #include "game.h"            // bring in Game struct and prototypes
-#include "minimax.h"        // AI helper functions
-#include "naive_bayes_ai.h" // Naive Bayes AI
+#include "minimax.h"         // AI helper functions
+#include "naive_bayes_ai.h"  // Naive Bayes AI
+#include "linear_regression_ai.h"  // Linear Regression AI
+#include "q_learning_ai.h"   // Q-Learning AI
+#include "model_config.h"    // AI configuration
+#include <stdio.h>
 
 // Global AI models (loaded once at startup)
 static NaiveBayesModel nb_model;
+static LinearRegressionModel lr_model;
+static QLearningModel ql_model;
+
 static int nb_model_loaded = 0;
+static int lr_model_loaded = 0;
+static int ql_model_loaded = 0;
+
+// Current AI configuration
+static AIConfig current_config;
 
 void game_init(Game *g)
 {
@@ -84,15 +96,109 @@ void game_check_end(Game *g) {
 }
 
 
-// Load the Naive Bayes model (call this once at startup)
-void game_load_nb_model(const char *model_path)
-{
+// ===== AI MODEL MANAGEMENT =====
+
+// Load all AI models with default paths
+void game_load_all_models(void) {
+    // Initialize configuration with best models preset
+    ai_config_preset_best_models(&current_config);
+    
+    // Load Naive Bayes model (non-terminal version by default)
     if (!nb_model_loaded) {
-        if (nb_load_model(model_path, &nb_model)) {
+        if (nb_load_model("../models/naive_bayes_non_terminal/model_non_terminal.txt", &nb_model)) {
             nb_model_loaded = 1;
+            printf("✓ Naive Bayes model loaded\n");
+        } else {
+            printf("✗ Failed to load Naive Bayes model\n");
         }
     }
+    
+    // Load Linear Regression model (non-terminal version by default)
+    if (!lr_model_loaded) {
+        if (lr_load_model("../models/linear_regression_non_terminal/model_non_terminal.txt", &lr_model)) {
+            lr_model_loaded = 1;
+            printf("✓ Linear Regression model loaded\n");
+        } else {
+            printf("✗ Failed to load Linear Regression model\n");
+        }
+    }
+    
+    // Load Q-Learning model (combined version by default - usually best)
+    if (!ql_model_loaded) {
+        if (ql_load_model("../models/q learning/q_learning_combined.txt", &ql_model)) {
+            ql_model_loaded = 1;
+            printf("✓ Q-Learning model loaded\n");
+        } else {
+            printf("✗ Failed to load Q-Learning model\n");
+        }
+    }
+    
+    printf("\nCurrent AI Configuration:\n");
+    printf("  Easy (Level 1):   %s\n", ai_config_get_model_name(current_config.easy_model));
+    printf("  Medium (Level 2): %s\n", ai_config_get_model_name(current_config.medium_model));
+    printf("  Hard (Level 3):   %s\n", ai_config_get_model_name(current_config.hard_model));
+    printf("\n");
 }
+
+// Set AI configuration
+void game_set_ai_config(const AIConfig *config) {
+    current_config = *config;
+    printf("AI Configuration updated:\n");
+    printf("  Easy (Level 1):   %s\n", ai_config_get_model_name(current_config.easy_model));
+    printf("  Medium (Level 2): %s\n", ai_config_get_model_name(current_config.medium_model));
+    printf("  Hard (Level 3):   %s\n", ai_config_get_model_name(current_config.hard_model));
+}
+
+// Get current AI configuration
+void game_get_ai_config(AIConfig *config) {
+    *config = current_config;
+}
+
+// Load specific model file (for swapping between dataset variants)
+void game_load_model_file(AIModelType model_type, const char *model_path) {
+    switch (model_type) {
+        case AI_MODEL_NAIVE_BAYES:
+            if (nb_load_model(model_path, &nb_model)) {
+                nb_model_loaded = 1;
+                printf("✓ Reloaded Naive Bayes model from: %s\n", model_path);
+            } else {
+                printf("✗ Failed to load Naive Bayes model from: %s\n", model_path);
+            }
+            break;
+            
+        case AI_MODEL_LINEAR_REGRESSION:
+            if (lr_load_model(model_path, &lr_model)) {
+                lr_model_loaded = 1;
+                printf("✓ Reloaded Linear Regression model from: %s\n", model_path);
+            } else {
+                printf("✗ Failed to load Linear Regression model from: %s\n", model_path);
+            }
+            break;
+            
+        case AI_MODEL_Q_LEARNING:
+            if (ql_model_loaded) {
+                ql_free_model(&ql_model);
+            }
+            if (ql_load_model(model_path, &ql_model)) {
+                ql_model_loaded = 1;
+                printf("✓ Reloaded Q-Learning model from: %s\n", model_path);
+            } else {
+                printf("✗ Failed to load Q-Learning model from: %s\n", model_path);
+            }
+            break;
+            
+        default:
+            printf("Warning: Cannot reload Minimax models (they are algorithmic)\n");
+            break;
+    }
+}
+
+// Get the name of the current AI for a given level
+const char* game_get_ai_name(int level) {
+    AIModelType model = ai_config_get_level(&current_config, level);
+    return ai_config_get_model_name(model);
+}
+
 
 // Public: if it's O's turn, ask AI to play based on level (1..3)
 void game_ai_move(Game *g, int level)
@@ -104,26 +210,40 @@ void game_ai_move(Game *g, int level)
     }
 
     int mv = -1;
-
-    // Level 1 = Easy = Naive Bayes AI
-    if (level == 1 && nb_model_loaded)
-    {
-        mv = nb_find_best_move(&nb_model, g->b);
-    }
-    // Level 2 = Medium = Minimax with depth limit (original level 2)
-    else if (level == 2)
-    {
-        mv = findBestMoveLvl(g->b, 2);
-    }
-    // Level 3 = Hard = Full Minimax (original level 3)
-    else if (level == 3)
-    {
-        mv = findBestMoveLvl(g->b, 3);
-    }
-    else
-    {
-        // Fallback to original minimax if Naive Bayes not loaded
-        mv = findBestMoveLvl(g->b, level);
+    AIModelType model = ai_config_get_level(&current_config, level);
+    
+    // Route to the appropriate AI model
+    switch (model) {
+        case AI_MODEL_NAIVE_BAYES:
+            if (nb_model_loaded) {
+                mv = nb_find_best_move(&nb_model, g->b);
+            }
+            break;
+            
+        case AI_MODEL_LINEAR_REGRESSION:
+            if (lr_model_loaded) {
+                mv = lr_find_best_move(&lr_model, g->b);
+            }
+            break;
+            
+        case AI_MODEL_Q_LEARNING:
+            if (ql_model_loaded) {
+                mv = ql_find_best_move(&ql_model, g->b);
+            }
+            break;
+            
+        case AI_MODEL_MINIMAX_EASY:
+            mv = findBestMoveLvl(g->b, 2);  // Depth-limited minimax
+            break;
+            
+        case AI_MODEL_MINIMAX_HARD:
+            mv = findBestMoveLvl(g->b, 3);  // Full minimax
+            break;
+            
+        default:
+            // Fallback to hard minimax
+            mv = findBestMoveLvl(g->b, 3);
+            break;
     }
 
     // If AI returned a valid empty cell, use it

@@ -11,7 +11,7 @@ if not exist "data related\dataset_processor.c" (
     echo Current directory: %CD%
     echo.
     echo Please navigate to src and run again:
-    echo   cd c:\Users\muhdh\Documents\GitHub\prog-meth-project\src
+    echo   cd c:\Users\muhdh\OneDrive\Documents\GitHub\prog-meth-project\src
     echo   .\train_models_compare.bat
     pause
     exit /b 1
