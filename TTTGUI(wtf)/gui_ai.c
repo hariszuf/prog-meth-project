@@ -44,6 +44,12 @@ int main(void)
     Sound winSound = LoadSound("audio/win.mp3");
     Sound loseSound = LoadSound("audio/lose.mp3");
 
+    // Load all AI models at startup
+    printf("========================================\n");
+    printf("Loading AI Models...\n");
+    printf("========================================\n");
+    game_load_all_models();
+    printf("========================================\n\n");
 
     Game g;           // game state
     game_init(&g);    // initialize game
@@ -371,7 +377,10 @@ int main(void)
         }
         else  // if PvAI mode
         {
-            DrawText("AI: O", 400, 100, 20, BLACK);  // AI label
+            // Show AI model name being used
+            char ai_label[100];
+            snprintf(ai_label, sizeof(ai_label), "AI: O (%s)", game_get_ai_name(level));
+            DrawText(ai_label, 350, 100, 20, BLACK);  // AI label with model name
         }
 
         // Draw status message
