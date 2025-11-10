@@ -84,7 +84,7 @@ int main(void)
         x += wAI + gap;   // move x position after AI button
 
         // Keep position after mode buttons (used for Reset PvP Stats)
-        int xAfterModeButtons = x;
+        //int xAfterModeButtons = x;
 
         // Difficulty buttons (only shown if in AI mode)
         Rectangle bE, bM, bH;
@@ -100,8 +100,8 @@ int main(void)
 
         // Define Reset PvP Stats button — always created, only visible in PvP
         // Define Reset PvP Stats button (smaller and compact)
-        int wReset = MeasureText("Reset", font) + 10;      // shorter label and narrower width
-        Rectangle bResetPvP = { (float)(xAfterModeButtons + 5), (float)(y + 50), (float)wReset, (float)(btnH - 10) };
+        //int wReset = MeasureText("Reset", font) + 10;      // shorter label and narrower width
+        //Rectangle bResetPvP = { (float)(xAfterModeButtons + 5), (float)(y + 50), (float)wReset, (float)(btnH - 10) };
 
         // Handle PvP mode button click
         if (Btn(bPVP, "Player vs Player", (mode == 0 ? BLUE : LIGHTGRAY), BLACK))
@@ -379,7 +379,7 @@ int main(void)
         {
             // Show AI model name being used
             char ai_label[100];
-            snprintf(ai_label, sizeof(ai_label), "AI: O (%s)", game_get_ai_name(level));
+            snprintf(ai_label, sizeof(ai_label), "AI: O (%s)",game_get_ai_name(level));
             DrawText(ai_label, 350, 100, 20, BLACK);  // AI label with model name
         }
 
