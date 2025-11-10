@@ -1,7 +1,9 @@
 @echo off
-REM Compilation script for Tic-Tac-Toe with Naive Bayes AI
+REM Compilation script for Tic-Tac-Toe with Modular AI System
 
-echo Compiling Tic-Tac-Toe GUI with AI...
+echo Compiling Tic-Tac-Toe GUI with Modular AI System...
+echo Including: Naive Bayes, Linear Regression, Q-Learning, Minimax
+echo.
 
 REM Adjust the raylib path if necessary
 REM This assumes raylib is installed in a standard location
@@ -12,6 +14,9 @@ gcc -o ttt_gui.exe ^
     game.c ^
     minimax.c ^
     naive_bayes_ai.c ^
+    linear_regression_ai.c ^
+    q_learning_ai.c ^
+    model_config.c ^
     stats.c ^
     -I"C:\raylib\raylib\src" ^
     -L"C:\raylib\raylib\src" ^
@@ -20,10 +25,22 @@ gcc -o ttt_gui.exe ^
 
 if %ERRORLEVEL% EQU 0 (
     echo.
-    echo Compilation successful! Run ttt_gui.exe to play.
+    echo ========================================
+    echo Compilation successful!
+    echo ========================================
+    echo Run ttt_gui.exe to play.
+    echo.
+    echo Current AI Configuration:
+    echo   Easy ^(Level 1^):   Minimax ^(Easy^)
+    echo   Medium ^(Level 2^): Q-Learning
+    echo   Hard ^(Level 3^):   Minimax ^(Hard^)
+    echo.
 ) else (
     echo.
-    echo Compilation failed. Please check the errors above.
+    echo ========================================
+    echo Compilation failed!
+    echo ========================================
+    echo Please check the errors above.
 )
 
 pause

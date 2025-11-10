@@ -1,0 +1,44 @@
+========================================
+TIC-TAC-TOE DATASET PROCESSING REPORT
+Generated from Minimax Optimal Dataset
+========================================
+
+FULL DATASET STATISTICS
+----------------------------------------
+Total samples: 4520
+Win outcomes:  2310 (51.11%)
+Lose outcomes: 1158 (25.62%)
+Draw outcomes: 1052 (23.27%)
+
+TRAINING SET STATISTICS
+----------------------------------------
+Total samples: 3616 (80.00% of full dataset)
+Win outcomes:  1820 (50.33%)
+Lose outcomes: 936 (25.88%)
+Draw outcomes: 860 (23.78%)
+
+TESTING SET STATISTICS
+----------------------------------------
+Total samples: 904 (20.00% of full dataset)
+Win outcomes:  490 (54.20%)
+Lose outcomes: 222 (24.56%)
+Draw outcomes: 192 (21.24%)
+
+DATA SPLIT CONFIGURATION
+----------------------------------------
+Training/Testing split: 80/20
+Features per sample: 9
+Feature encoding: x (X player), o (O player), b (blank)
+Target variable: win, lose, draw (3 classes)
+Shuffling: YES (Random seed based on system time)
+Data source: Minimax algorithm (optimal play)
+
+OUTPUT FILES
+----------------------------------------
+Training set: train.data
+Testing set: test.data
+Report: dataset_report.txt
+
+========================================
+Note: All outcomes represent optimal play
+========================================
