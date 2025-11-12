@@ -10,7 +10,8 @@
       "includePath": [
         "${workspaceFolder}",
         "C:/msys64/ucrt64/include/**",
-        "C:/raylib-5.5_win64_mingw-w64/include"
+        "C:/raylib-5.5_win64_mingw-w64/include",
+        
       ],
       "browse": { 
         "path": [

@@ -235,7 +235,7 @@ int main(void)
             else if (mode == 1)  // PvAI mode
             {
                 if (g.winner == 1)
-                    PlaySound(winSound);   // You win
+                    PlaySound(winSound);   // Player wins
                 else if (g.winner == 2)
                     PlaySound(loseSound);  // AI wins
             }
