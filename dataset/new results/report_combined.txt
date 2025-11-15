@@ -13,16 +13,16 @@ Draw outcomes: 1068 (19.50%)
 TRAINING SET STATISTICS
 ----------------------------------------
 Total samples: 4382 (79.99% of full dataset)
-Win outcomes:  2331 (53.19%)
-Lose outcomes: 1187 (27.09%)
-Draw outcomes: 864 (19.72%)
+Win outcomes:  2351 (53.65%)
+Lose outcomes: 1182 (26.97%)
+Draw outcomes: 849 (19.37%)
 
 TESTING SET STATISTICS
 ----------------------------------------
 Total samples: 1096 (20.01% of full dataset)
-Win outcomes:  605 (55.20%)
-Lose outcomes: 287 (26.19%)
-Draw outcomes: 204 (18.61%)
+Win outcomes:  585 (53.38%)
+Lose outcomes: 292 (26.64%)
+Draw outcomes: 219 (19.98%)
 
 DATA SPLIT CONFIGURATION
 ----------------------------------------
