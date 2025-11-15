@@ -32,13 +32,13 @@ void game_init(Game *g)
 
 
 
-// Public: reset game (same behavior as init for simplicity)
+// reset game
 void game_reset(Game *g)
 {
-    game_init(g);                           // reuse initialization
+    game_init(g);                          
 }
 
-// Public: check if there is any empty cell left
+// check if there is any empty cell left
 int game_is_full(const Game *g)
 {
     for (int i = 0; i < 9; i++)                 // scan all cells
@@ -107,9 +107,9 @@ void game_load_all_models(void) {
     if (!nb_model_loaded) {
         if (nb_load_model("../models/naive_bayes_non_terminal/model_non_terminal.txt", &nb_model)) {
             nb_model_loaded = 1;
-            printf("✓ Naive Bayes model loaded\n");
+            printf("Naive Bayes model loaded\n");
         } else {
-            printf("✗ Failed to load Naive Bayes model\n");
+            printf("Failed to load Naive Bayes model\n");
         }
     }
     
@@ -117,9 +117,9 @@ void game_load_all_models(void) {
     if (!lr_model_loaded) {
         if (lr_load_model("../models/linear_regression_non_terminal/model_non_terminal.txt", &lr_model)) {
             lr_model_loaded = 1;
-            printf("✓ Linear Regression model loaded\n");
+            printf("Linear Regression model loaded\n");
         } else {
-            printf("✗ Failed to load Linear Regression model\n");
+            printf("Failed to load Linear Regression model\n");
         }
     }
     
@@ -127,9 +127,9 @@ void game_load_all_models(void) {
     if (!ql_model_loaded) {
         if (ql_load_model("../models/q learning/q_learning_combined.txt", &ql_model)) {
             ql_model_loaded = 1;
-            printf("✓ Q-Learning model loaded\n");
+            printf("Q-Learning model loaded\n");
         } else {
-            printf("✗ Failed to load Q-Learning model\n");
+            printf("Failed to load Q-Learning model\n");
         }
     }
     
@@ -160,18 +160,18 @@ void game_load_model_file(AIModelType model_type, const char *model_path) {
         case AI_MODEL_NAIVE_BAYES:
             if (nb_load_model(model_path, &nb_model)) {
                 nb_model_loaded = 1;
-                printf("✓ Reloaded Naive Bayes model from: %s\n", model_path);
+                printf("Reloaded Naive Bayes model from: %s\n", model_path);
             } else {
-                printf("✗ Failed to load Naive Bayes model from: %s\n", model_path);
+                printf("Failed to load Naive Bayes model from: %s\n", model_path);
             }
             break;
             
         case AI_MODEL_LINEAR_REGRESSION:
             if (lr_load_model(model_path, &lr_model)) {
                 lr_model_loaded = 1;
-                printf("✓ Reloaded Linear Regression model from: %s\n", model_path);
+                printf("Reloaded Linear Regression model from: %s\n", model_path);
             } else {
-                printf("✗ Failed to load Linear Regression model from: %s\n", model_path);
+                printf("Failed to load Linear Regression model from: %s\n", model_path);
             }
             break;
             
@@ -181,9 +181,9 @@ void game_load_model_file(AIModelType model_type, const char *model_path) {
             }
             if (ql_load_model(model_path, &ql_model)) {
                 ql_model_loaded = 1;
-                printf("✓ Reloaded Q-Learning model from: %s\n", model_path);
+                printf("Reloaded Q-Learning model from: %s\n", model_path);
             } else {
-                printf("✗ Failed to load Q-Learning model from: %s\n", model_path);
+                printf("Failed to load Q-Learning model from: %s\n", model_path);
             }
             break;
             
