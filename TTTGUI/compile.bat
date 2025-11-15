@@ -31,9 +31,9 @@ if %ERRORLEVEL% EQU 0 (
     echo Run ttt_gui.exe to play.
     echo.
     echo Current AI Configuration:
-    echo   Easy ^(Level 1^):   Minimax ^(Easy^)
+    echo   Easy ^(Level 1^):   Minimax ^(Imperfect^)
     echo   Medium ^(Level 2^): Q-Learning
-    echo   Hard ^(Level 3^):   Minimax ^(Hard^)
+    echo   Hard ^(Level 3^):   Minimax ^(Perfect^)
     echo.
 ) else (
     echo.
