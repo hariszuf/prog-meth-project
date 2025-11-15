@@ -1,10 +1,8 @@
-// stats.c — keeps separate statistics for PvP and PvAI
-#include <stdio.h>      // for file operations: fopen, fscanf, fprintf, fclose
-#include "stats.h"      // include our own header for function prototypes and enums
+#include <stdio.h>     
+#include "stats.h"     
 #include <time.h>
 #include <windows.h>
 #include <psapi.h>
-// File name to store all statistics
 #define STATS_FILE "tictactoe_stats.txt"
 #define AI_TIME_FILE "ai_timing.txt"
 
@@ -74,13 +72,13 @@ void stats_log_ai_move(int mode, int level, int move_no, double ms)
 
 // Each category keeps total games, wins for X, wins for O, and draws
 typedef struct {
-    int games;      // total games played
-    int x_wins;     // total X wins
-    int o_wins;     // total O wins
-    int draws;      // total draws
+    int games;      
+    int x_wins;   
+    int o_wins;     
+    int draws;      
 } Stats;
 
-// PvAI now has 3 difficulty levels
+
 typedef struct {
     Stats easy;
     Stats medium;
@@ -89,8 +87,8 @@ typedef struct {
 
 // Struct containing both categories
 typedef struct {
-    Stats pvp;       // Player vs Player statistics
-    PvAIStats pvai;  // Player vs AI statistics (split by difficulty)
+    Stats pvp;       
+    PvAIStats pvai;  
 } AllStats;
 
 static void save_all(AllStats *all)
