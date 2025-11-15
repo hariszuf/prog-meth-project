@@ -29,9 +29,6 @@ void game_init(Game *g)
     g->winner = 0;
 }
 
-
-
-
 // reset game
 void game_reset(Game *g)
 {
@@ -51,7 +48,7 @@ int game_is_full(const Game *g)
     return 1;                               // all cells taken
 }
 
-// Public: place current player's mark at index if legal
+// place current player's mark at index if legal
 int game_make_move(Game *g, int index)
 {
     if (index < 0 || index > 8)   
@@ -66,17 +63,17 @@ int game_make_move(Game *g, int index)
 
     g->b[index] = g->turn; // write current player's sign
 
-    // switch turn to the other player (expanded if/else version)
+    // switch turn to the other player 
     if (g->turn == 'X')
     {
-        g->turn = 'O';                      // after X, now O moves
+        g->turn = 'O';                      //O move
     }
     else
     {
-        g->turn = 'X';                      // after O, now X moves
+        g->turn = 'X';                      //X move
     }
 
-    return 1;                               // move was successful
+    return 1;                               //move successful
 }
 
 // Public: set winner state based on current board
