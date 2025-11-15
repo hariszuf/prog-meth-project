@@ -123,13 +123,13 @@ void game_load_all_models(void) {
         }
     }
     
-    // Load Q-Learning model (combined version by default - usually best)
+    // Load Q-Learning model (non-terminal version by default)
     if (!ql_model_loaded) {
-        if (ql_load_model("../models/q learning/q_learning_combined.txt", &ql_model)) {
+        if (ql_load_model("../models/q learning/q_learning_non_terminal.txt", &ql_model)) {
             ql_model_loaded = 1;
-            printf("Q-Learning model loaded\n");
+            printf("✓ Q-Learning model loaded\n");
         } else {
-            printf("Failed to load Q-Learning model\n");
+            printf("✗ Failed to load Q-Learning model\n");
         }
     }
     
