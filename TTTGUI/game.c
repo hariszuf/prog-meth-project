@@ -45,26 +45,26 @@ int game_is_full(const Game *g)
     {
         if (g->b[i] != 'X' && g->b[i] != 'O') // if cell is not taken
         {
-            return 0;                       // not full yet
+            return 0;                       // not full 
         }
     }
-    return 1;                               // all cells are taken
+    return 1;                               // all cells taken
 }
 
-// Public: place current player's mark at index (0..8) if legal
+// Public: place current player's mark at index if legal
 int game_make_move(Game *g, int index)
 {
-    if (index < 0 || index > 8)                 // index out of range?
+    if (index < 0 || index > 8)   
     {
-        return 0;                           // reject
+        return 0; 
     }
 
-    if (g->b[index] == 'X' || g->b[index] == 'O') // already occupied?
+    if (g->b[index] == 'X' || g->b[index] == 'O') // full
     {
-        return 0;                           // reject
+        return 0;   
     }
 
-    g->b[index] = g->turn;                    // write current player's mark
+    g->b[index] = g->turn; // write current player's sign
 
     // switch turn to the other player (expanded if/else version)
     if (g->turn == 'X')
@@ -251,7 +251,7 @@ void game_ai_move(Game *g, int level)
     {
         g->b[mv] = 'O';             // place O
         g->turn = 'X';              // switch turn to X
-        return;                     // done
+        return;                    
     }
 
     // Fallback: choose the first free cell if AI failed

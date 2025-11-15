@@ -9,44 +9,41 @@
 #define AI_TIME_FILE "ai_timing.txt"
 
 
-// Function: get_memory_kb
-// Purpose:  Return the current process memory usage (Working Set) in kilobytes
+
+// Return the current process memory usage in kilobytes
 static double get_memory_kb(void)
 {
-    PROCESS_MEMORY_COUNTERS pmc;                      // struct to hold memory info
+    PROCESS_MEMORY_COUNTERS pmc; // struct to hold memory info
 
-    // Retrieve memory information about the current process
+    // Retrieve memory information for the current process
     if (GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc))) {
-        // Convert bytes (WorkingSetSize) to kilobytes for easier reading
-        return (double)pmc.WorkingSetSize / 1024.0;   
+        // Convert bytes (WorkingSetSize) to kilobytes
+        return (double)pmc.WorkingSetSize / 1024.0;   // in KB
     }
-
-    // If memory info could not be obtained, return 0
     return 0.0;
 }
 
 
 
-// Function: stats_log_ai_move
-// Purpose:  Record AI performance data (timing and memory) to a log file
+
+// Record AI performance data to log file
 void stats_log_ai_move(int mode, int level, int move_no, double ms)
 {
-    // Open the performance log file in append mode
+
     FILE *f = fopen(AI_TIME_FILE, "a");
 
     // If file cannot be opened, exit function early
     if (!f) return;
 
-    // Get the current time (in seconds since 1970)
+    // Get the current time 
     time_t now = time(NULL);
 
     // Convert time to local time structure
     struct tm *lt = localtime(&now);
 
-    // Character array to store formatted timestamp
+    // store formatted timestamp
     char ts[32];
 
-    // Format time into a readable string like "2025-11-05 18:25:45"
     strftime(ts, sizeof ts, "%Y-%m-%d %H:%M:%S", lt);
 
     // Declare a string pointer to hold difficulty level text
@@ -60,20 +57,18 @@ void stats_log_ai_move(int mode, int level, int move_no, double ms)
     else if (level == 3)
         levelmode = "Hard";
     else
-        levelmode = "Unknown";  // if an unexpected value appears
+        levelmode = "Unknown"; 
 
     // Get current process memory usage in KB
     double mem_kb = get_memory_kb();
 
-    // Example output line (for reference):
-    // 2025-11-04 09:32:18, mode=PVAI, level=Hard, move=7, ms=4.317, mem=28312.44KB
 
     // Write a line of data into the log file
     fprintf(f, "%s, mode=%s, level=%s, move=%d, ms=%.3f, mem=%.2fKB\n",
-            ts,                               // timestamp (date and time)
+            ts,                               // timestamp 
             (mode == 0 ? "PVP" : "PVAI"),     // determine if Player vs Player or Player vs AI
-            levelmode,                        // difficulty string (Easy, Medium, Hard)
-            move_no,                          // which move number this is
+            levelmode,                        // difficulty level
+            move_no,                          // The move number in the game
             ms,                               // time taken for AI move in milliseconds
             mem_kb);                          // memory used at the moment (in KB)
 
@@ -142,10 +137,7 @@ static void load_all(AllStats *all)
     fclose(f);
 }
 
-/*---------------------------------------------
-   Function: stats_record_result_mode
-   Purpose: update statistics after each game
-----------------------------------------------*/
+// update of stats after a game ends
 void stats_record_result_mode(StatsMode mode, int level, int winner)
 {
     AllStats all;
@@ -176,19 +168,16 @@ void stats_record_result_mode(StatsMode mode, int level, int winner)
     save_all(&all);
 }
 
-/*---------------------------------------------
-   Function: stats_get_counts_mode
-   Purpose: return the stats of a given mode
-----------------------------------------------*/
+// return stats of the given mode and level
 void stats_get_counts_mode(StatsMode mode, int level, int *games, int *x_wins, int *o_wins, int *draws) {
     AllStats all;     // Struct to hold both PvP and PvAI stats
     load_all(&all);   // Load stats from the file
     Stats *cat = NULL; // Pointer to selected stats category
 
-    if (mode == STATS_PVP) {      // If it's PvP mode
+    if (mode == STATS_PVP) {     
         cat = &all.pvp;           // Select PvP stats
     }
-    else if (mode == STATS_PVAI) {  // If it's PvAI mode
+    else if (mode == STATS_PVAI) {  
         if (level == 1)           // Easy level
             cat = &all.pvai.easy;
         else if (level == 2)      // Medium level
