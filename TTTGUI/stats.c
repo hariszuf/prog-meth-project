@@ -29,52 +29,48 @@ static double get_memory_kb(void)
 // Record AI performance data to log file
 void stats_log_ai_move(int mode, int level, int move_no, double ms)
 {
-
     FILE *f = fopen(AI_TIME_FILE, "a");
 
-    // If file cannot be opened, exit function early
-    if (!f) return;
+    if (!f) {
+        return; 
+    }
 
-    // Get the current time 
     time_t now = time(NULL);
 
-    // Convert time to local time structure
     struct tm *lt = localtime(&now);
 
-    // store formatted timestamp
     char ts[32];
 
     strftime(ts, sizeof ts, "%Y-%m-%d %H:%M:%S", lt);
 
-    // Declare a string pointer to hold difficulty level text
     const char *levelmode;
 
-    // Determine difficulty name based on level value
-    if (level == 1)
+    if (level == 1) {
         levelmode = "Easy";
-    else if (level == 2)
+    }
+    else if (level == 2) {
         levelmode = "Medium";
-    else if (level == 3)
+    }
+    else if (level == 3) {
         levelmode = "Hard";
-    else
-        levelmode = "Unknown"; 
+    }
+    else {
+        levelmode = "Unknown";
+    }
 
-    // Get current process memory usage in KB
     double mem_kb = get_memory_kb();
 
-
-    // Write a line of data into the log file
     fprintf(f, "%s, mode=%s, level=%s, move=%d, ms=%.3f, mem=%.2fKB\n",
-            ts,                               // timestamp 
-            (mode == 0 ? "PVP" : "PVAI"),     // determine if Player vs Player or Player vs AI
-            levelmode,                        // difficulty level
-            move_no,                          // The move number in the game
-            ms,                               // time taken for AI move in milliseconds
-            mem_kb);                          // memory used at the moment (in KB)
+            ts,
+            (mode == 0 ? "PVP" : "PVAI"),
+            levelmode,
+            move_no,
+            ms,
+            mem_kb);
 
-    // Close the file to save changes
     fclose(f);
 }
+
 
 // Each category keeps total games, wins for X, wins for O, and draws
 typedef struct {
@@ -100,7 +96,9 @@ typedef struct {
 static void save_all(AllStats *all)
 {
     FILE *f = fopen(STATS_FILE, "w");
-    if (!f) return;
+    if (!f){
+        return;
+    } 
 
     // Write all numbers in order
     fprintf(f,
@@ -148,52 +146,73 @@ void stats_record_result_mode(StatsMode mode, int level, int winner)
         cat = &all.pvp;
     } 
     else if (mode == STATS_PVAI) {
-        // choose by difficulty
-        if (level == 1)
+        if (level == 1) {
             cat = &all.pvai.easy;
-        else if (level == 2)
+        }
+        else if (level == 2) {
             cat = &all.pvai.medium;
-        else if (level == 3)
+        }
+        else if (level == 3) {
             cat = &all.pvai.hard;
-        else
+        }
+        else {
             return; // invalid level
+        }
     }
-    else return; // invalid mode
+    else {
+        return; // invalid mode
+    }
 
     cat->games++;
-    if (winner == 1)      cat->x_wins++;
-    else if (winner == 2) cat->o_wins++;
-    else                  cat->draws++;
+
+    if (winner == 1) {
+        cat->x_wins++;
+    }
+    else if (winner == 2) {
+        cat->o_wins++;
+    }
+    else {
+        cat->draws++;
+    }
 
     save_all(&all);
 }
 
 // return stats of the given mode and level
 void stats_get_counts_mode(StatsMode mode, int level, int *games, int *x_wins, int *o_wins, int *draws) {
-    AllStats all;     // Struct to hold both PvP and PvAI stats
-    load_all(&all);   // Load stats from the file
-    Stats *cat = NULL; // Pointer to selected stats category
+    AllStats all;     
+    load_all(&all);   
+    Stats *cat = NULL;
 
-    if (mode == STATS_PVP) {     
-        cat = &all.pvp;           // Select PvP stats
+    if (mode == STATS_PVP) {    
+        cat = &all.pvp;         
     }
     else if (mode == STATS_PVAI) {  
-        if (level == 1)           // Easy level
+        if (level == 1) {         
             cat = &all.pvai.easy;
-        else if (level == 2)      // Medium level
+        }
+        else if (level == 2) {      
             cat = &all.pvai.medium;
-        else if (level == 3)      // Hard level
+        }
+        else if (level == 3) {      
             cat = &all.pvai.hard;
+        }
+        else {                      
+            cat = NULL; // invalid level
+        }
+    }
+    else {
+        cat = NULL; // invalid mode
     }
 
     if (cat != NULL) {
-        // Populate the stats from the selected category
-        if (games != NULL)  *games  = cat->games;
-        if (x_wins != NULL) *x_wins = cat->x_wins;
-        if (o_wins != NULL) *o_wins = cat->o_wins;
-        if (draws != NULL)  *draws  = cat->draws;
+        if (games != NULL)  { *games  = cat->games; }
+        if (x_wins != NULL) { *x_wins = cat->x_wins; }
+        if (o_wins != NULL) { *o_wins = cat->o_wins; }
+        if (draws != NULL)  { *draws  = cat->draws; }
     }
 }
+
 
 
 void stats_reset_pvp(void)
