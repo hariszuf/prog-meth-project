@@ -46,11 +46,11 @@ const char* ai_config_get_model_name(AIModelType model) {
         case AI_MODEL_LINEAR_REGRESSION:
             return "Linear Regression";
         case AI_MODEL_Q_LEARNING:
-            return "Q-Learning(Medium)";
+            return "Q-Learning";
         case AI_MODEL_MINIMAX_EASY:
-            return "Minimax (Imperfect)";
+            return "Imperfect Minimax";
         case AI_MODEL_MINIMAX_HARD:
-            return "Minimax (Perfect)";
+            return "Perfect Minimax";
         default:
             return "Unknown";
     }
