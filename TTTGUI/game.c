@@ -122,7 +122,7 @@ void game_load_all_models(void)
     // Load Q-Learning
     if (!ql_model_loaded)
     {
-        if (ql_load_model("../models/q learning/q_learning_non_terminal.txt", &ql_model))
+        if (ql_load_model("../models/q learning/q_learning_dataset.txt", &ql_model))
         {
             ql_model_loaded = 1;
             printf("Q-Learning model loaded\n");
