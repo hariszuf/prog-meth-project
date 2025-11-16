@@ -118,7 +118,6 @@ void game_load_all_models(void)
         else
             printf("Failed to load Linear Regression model\n");
     }
-<<<<<<< HEAD
 
     // Load Q-Learning
     if (!ql_model_loaded)
@@ -127,16 +126,6 @@ void game_load_all_models(void)
         {
             ql_model_loaded = 1;
             printf("Q-Learning model loaded\n");
-=======
-    
-    // Load Q-Learning model (non-terminal version by default)
-    if (!ql_model_loaded) {
-        if (ql_load_model("../models/q learning/q_learning_non_terminal.txt", &ql_model)) {
-            ql_model_loaded = 1;
-            printf("✓ Q-Learning model loaded\n");
-        } else {
-            printf("✗ Failed to load Q-Learning model\n");
->>>>>>> 66fe3c4d500dab04303d27477bd54ac8c7da79b8
         }
         else
             printf("Failed to load Q-Learning model\n");
