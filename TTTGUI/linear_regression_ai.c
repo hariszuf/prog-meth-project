@@ -15,12 +15,16 @@ int lr_load_model(const char *filename, LinearRegressionModel *model) {
     char line[256];
     int weight_idx = 0;
     
-    // Read weights from file (format: "Weight[0] = value")
+    // Read weights from file (format: "Weight[0] (label): value")
     while (fgets(line, sizeof(line), file) && weight_idx < NUM_FEATURES) {
-        if (strstr(line, "Weight") != NULL) {
+        if (strstr(line, "Weight[") != NULL) {
             double weight;
-            if (sscanf(line, "Weight[%*d] = %lf", &weight) == 1) {
-                model->weights[weight_idx++] = weight;
+            // Try to find the colon and read the value after it
+            char *colon = strchr(line, ':');
+            if (colon != NULL) {
+                if (sscanf(colon + 1, "%lf", &weight) == 1) {
+                    model->weights[weight_idx++] = weight;
+                }
             }
         }
     }

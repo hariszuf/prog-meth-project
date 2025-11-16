@@ -1,0 +1,127 @@
+========================================
+NAIVE BAYES MODEL
+========================================
+
+LABEL PROBABILITIES
+----------------------------------------
+Total labels: 3
+
+Label: draw       P(Label) = 0.181000
+Label: win        P(Label) = 0.502000
+Label: lose       P(Label) = 0.317000
+
+
+FEATURE PROBABILITIES
+========================================
+
+Feature 0: (9 unique state-label pairs)
+----------------------------------------
+  State=x     | Label=draw       | P(State|Label) = 0.281768
+  State=x     | Label=win        | P(State|Label) = 0.346614
+  State=b     | Label=win        | P(State|Label) = 0.368526
+  State=b     | Label=draw       | P(State|Label) = 0.480663
+  State=x     | Label=lose       | P(State|Label) = 0.312303
+  State=o     | Label=win        | P(State|Label) = 0.284861
+  State=b     | Label=lose       | P(State|Label) = 0.353312
+  State=o     | Label=lose       | P(State|Label) = 0.334385
+  State=o     | Label=draw       | P(State|Label) = 0.237569
+
+Feature 1: (9 unique state-label pairs)
+----------------------------------------
+  State=b     | Label=draw       | P(State|Label) = 0.353591
+  State=o     | Label=win        | P(State|Label) = 0.322709
+  State=b     | Label=win        | P(State|Label) = 0.376494
+  State=o     | Label=lose       | P(State|Label) = 0.246057
+  State=x     | Label=win        | P(State|Label) = 0.300797
+  State=b     | Label=lose       | P(State|Label) = 0.305994
+  State=x     | Label=lose       | P(State|Label) = 0.447950
+  State=x     | Label=draw       | P(State|Label) = 0.348066
+  State=o     | Label=draw       | P(State|Label) = 0.298343
+
+Feature 2: (9 unique state-label pairs)
+----------------------------------------
+  State=x     | Label=draw       | P(State|Label) = 0.337017
+  State=b     | Label=win        | P(State|Label) = 0.346614
+  State=o     | Label=win        | P(State|Label) = 0.286853
+  State=b     | Label=draw       | P(State|Label) = 0.430939
+  State=x     | Label=win        | P(State|Label) = 0.366534
+  State=x     | Label=lose       | P(State|Label) = 0.353312
+  State=b     | Label=lose       | P(State|Label) = 0.318612
+  State=o     | Label=draw       | P(State|Label) = 0.232044
+  State=o     | Label=lose       | P(State|Label) = 0.328076
+
+Feature 3: (9 unique state-label pairs)
+----------------------------------------
+  State=x     | Label=draw       | P(State|Label) = 0.292818
+  State=x     | Label=win        | P(State|Label) = 0.280876
+  State=b     | Label=draw       | P(State|Label) = 0.453039
+  State=o     | Label=win        | P(State|Label) = 0.332669
+  State=o     | Label=lose       | P(State|Label) = 0.214511
+  State=b     | Label=win        | P(State|Label) = 0.386454
+  State=o     | Label=draw       | P(State|Label) = 0.254144
+  State=x     | Label=lose       | P(State|Label) = 0.457413
+  State=b     | Label=lose       | P(State|Label) = 0.328076
+
+Feature 4: (9 unique state-label pairs)
+----------------------------------------
+  State=o     | Label=draw       | P(State|Label) = 0.337017
+  State=o     | Label=win        | P(State|Label) = 0.209163
+  State=x     | Label=win        | P(State|Label) = 0.412351
+  State=b     | Label=lose       | P(State|Label) = 0.321767
+  State=b     | Label=win        | P(State|Label) = 0.378486
+  State=x     | Label=lose       | P(State|Label) = 0.258675
+  State=b     | Label=draw       | P(State|Label) = 0.364641
+  State=x     | Label=draw       | P(State|Label) = 0.298343
+  State=o     | Label=lose       | P(State|Label) = 0.419558
+
+Feature 5: (9 unique state-label pairs)
+----------------------------------------
+  State=o     | Label=draw       | P(State|Label) = 0.226519
+  State=o     | Label=win        | P(State|Label) = 0.308765
+  State=b     | Label=win        | P(State|Label) = 0.410359
+  State=x     | Label=draw       | P(State|Label) = 0.381215
+  State=b     | Label=lose       | P(State|Label) = 0.353312
+  State=o     | Label=lose       | P(State|Label) = 0.220820
+  State=x     | Label=lose       | P(State|Label) = 0.425868
+  State=b     | Label=draw       | P(State|Label) = 0.392265
+  State=x     | Label=win        | P(State|Label) = 0.280876
+
+Feature 6: (9 unique state-label pairs)
+----------------------------------------
+  State=o     | Label=draw       | P(State|Label) = 0.243094
+  State=b     | Label=win        | P(State|Label) = 0.364542
+  State=x     | Label=win        | P(State|Label) = 0.358566
+  State=x     | Label=lose       | P(State|Label) = 0.328076
+  State=o     | Label=win        | P(State|Label) = 0.276892
+  State=b     | Label=lose       | P(State|Label) = 0.340694
+  State=x     | Label=draw       | P(State|Label) = 0.342541
+  State=b     | Label=draw       | P(State|Label) = 0.414365
+  State=o     | Label=lose       | P(State|Label) = 0.331230
+
+Feature 7: (9 unique state-label pairs)
+----------------------------------------
+  State=x     | Label=draw       | P(State|Label) = 0.364641
+  State=b     | Label=win        | P(State|Label) = 0.402390
+  State=o     | Label=win        | P(State|Label) = 0.324701
+  State=x     | Label=win        | P(State|Label) = 0.272908
+  State=o     | Label=lose       | P(State|Label) = 0.242902
+  State=x     | Label=lose       | P(State|Label) = 0.463722
+  State=b     | Label=draw       | P(State|Label) = 0.408840
+  State=b     | Label=lose       | P(State|Label) = 0.293375
+  State=o     | Label=draw       | P(State|Label) = 0.226519
+
+Feature 8: (9 unique state-label pairs)
+----------------------------------------
+  State=b     | Label=draw       | P(State|Label) = 0.436464
+  State=x     | Label=win        | P(State|Label) = 0.378486
+  State=b     | Label=win        | P(State|Label) = 0.354582
+  State=x     | Label=lose       | P(State|Label) = 0.296530
+  State=o     | Label=win        | P(State|Label) = 0.266932
+  State=o     | Label=lose       | P(State|Label) = 0.334385
+  State=b     | Label=lose       | P(State|Label) = 0.369085
+  State=x     | Label=draw       | P(State|Label) = 0.276243
+  State=o     | Label=draw       | P(State|Label) = 0.287293
+
+========================================
+END OF MODEL
+========================================
