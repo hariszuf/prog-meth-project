@@ -345,16 +345,20 @@ int main() {
     printf("========================================\n");
     printf("Testing all available models...\n");
     
-    QLearningModel ql_scratch, ql_dataset;
+    QLearningModel ql_scratch, ql_dataset, ql_continuous;
     
     // Load models
     printf("\nLoading Q-Learning (From-Scratch)...\n");
     int scratch_entries = ql_load_model("../models/q learning/q_learning_from_scratch.txt", &ql_scratch);
     printf("  Loaded %d entries (4KB file)\n", scratch_entries);
     
-    printf("\nLoading Q-Learning (Dataset-Init)...\n");
+    printf("\nLoading Q-Learning (Dataset-Init Production)...\n");
     int dataset_entries = ql_load_model("../models/q learning/q_learning_non_terminal.txt", &ql_dataset);
     printf("  Loaded %d entries (527KB file)\n", dataset_entries);
+    
+    printf("\nLoading Q-Learning (Your New Training Run)...\n");
+    int continuous_entries = ql_load_model("../models/q learning/q_learning_dataset.txt", &ql_continuous);
+    printf("  Loaded %d entries\n", continuous_entries);
     
     int num_games = 100;
     
@@ -364,7 +368,11 @@ int main() {
     }
     
     if (dataset_entries > 0) {
-        evaluate_model("Q-Learning (Dataset-Init, 50K episodes)", &ql_dataset, MODEL_Q_LEARNING_DATASET, num_games);
+        evaluate_model("Q-Learning (Dataset-Init Production, 50K episodes)", &ql_dataset, MODEL_Q_LEARNING_DATASET, num_games);
+    }
+    
+    if (continuous_entries > 0) {
+        evaluate_model("Q-Learning (Your New Training Run)", &ql_continuous, MODEL_Q_LEARNING_DATASET, num_games);
     }
     
     evaluate_model("Minimax Easy (Depth 4)", NULL, MODEL_MINIMAX_EASY, num_games);
@@ -374,14 +382,20 @@ int main() {
     printf("\n========================================\n");
     printf("RECOMMENDATION\n");
     printf("========================================\n");
-    printf("\nFor best move prediction:\n");
+    printf("\nModel Rankings (by Quality Score):\n");
     printf("  1. Minimax Perfect - Always optimal, but predictable\n");
-    printf("  2. Check which Q-Learning has highest quality score\n");
+    printf("  2. Check Q-Learning models above for highest score\n");
     printf("  3. Minimax Easy - Good balance of challenge\n");
+    printf("\nYour Models Comparison:\n");
+    printf("  From-Scratch:     120 entries,   4 KB  (compact, critical positions)\n");
+    printf("  Production:    16,167 entries, 527 KB  (comprehensive, original)\n");
+    printf("  New Training: ~16,000 entries, 527 KB  (your latest run)\n");
     printf("\nFor Medium difficulty, use the Q-Learning model with:\n");
-    printf("  - Highest draw rate vs Minimax Easy\n");
-    printf("  - Good win rate vs Random\n");
+    printf("  - Highest draw rate vs Minimax Easy (100%% = optimal)\n");
+    printf("  - Good win rate vs Random (70%%+)\n");
     printf("  - Best overall quality score\n");
+    printf("\nNote: If Continuous model underperforms, retrain with:\n");
+    printf("  train.bat → Dataset-Init → 10,000 episodes\n");
     
     return 0;
 }
