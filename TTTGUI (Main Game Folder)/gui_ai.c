@@ -7,7 +7,6 @@
 #include "stats.h"      // stats file
 
 
-
 //Button function: draws button and returns true if clicked
 static bool Btn(Rectangle r, const char* label, Color bg, Color fg)
 {
@@ -29,7 +28,7 @@ static bool Btn(Rectangle r, const char* label, Color bg, Color fg)
 
 int main(void)
 {
-    const int W = 600;      // window width
+    const int W = 620;      // window width
     const int H = 720;      // window height
     const int CELL = 150;   // size of each grid cell
     const int OFFX = 80;    // grid x offset from left
@@ -67,7 +66,7 @@ int main(void)
         int padX = 20;  // button padding
         int btnH = 40;  // button height
         int gap = 30;   // gap between buttons
-        int x = 10;     // current x position for placing buttons
+        int x = 20;     // current x position for placing buttons
         int y = 20;     // y position for buttons
 
         // Calculate button widths based on text
@@ -98,10 +97,12 @@ int main(void)
             x += wH + gap;
         }
 
-        // Define Reset PvP Stats button — always created, only visible in PvP
-        // Define Reset PvP Stats button (smaller and compact)
-        //int wReset = MeasureText("Reset", font) + 10;      // shorter label and narrower width
-        //Rectangle bResetPvP = { (float)(xAfterModeButtons + 5), (float)(y + 50), (float)wReset, (float)(btnH - 10) };
+        /* 
+        Define Reset PvP Stats button only visible in PvP
+        Define Reset PvP Stats button (smaller and compact)
+        int wReset = MeasureText("Reset", font) + 10;      // shorter label and narrower width
+        Rectangle bResetPvP = { (float)(xAfterModeButtons + 5), (float)(y + 50), (float)wReset, (float)(btnH - 10) };
+        */
 
         // Handle PvP mode button click
         if (Btn(bPVP, "Player vs Player", (mode == 0 ? BLUE : LIGHTGRAY), BLACK))
@@ -265,15 +266,15 @@ int main(void)
             
             if (level == 1)  // Easy Mode
             {
-                DrawText("Easy", 500, 70, 20, GREEN);  // draw Easy
+                DrawText(" Easy", 500, 70, 20, GREEN);  // draw Easy
             }
             else if (level == 2)  // Medium mode
             {
-                DrawText("Medium", 500, 70, 20, ORANGE);  // draw Medium
+                DrawText(" Medium", 500, 70, 20, ORANGE);  // draw Medium
             }
             else  // Hard mode
             {
-                DrawText("Hard", 500, 70, 20, RED);  // draw Hard
+                DrawText(" Hard", 500, 70, 20, RED);  // draw Hard
             }
         }
 
