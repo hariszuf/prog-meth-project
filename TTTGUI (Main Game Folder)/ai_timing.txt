@@ -1289,3 +1289,7 @@
 2025-11-20 15:54:42, mode=PVAI, level=Easy, move=1, ms=0.114, mem=77024.00KB
 2025-11-20 15:54:43, mode=PVAI, level=Easy, move=2, ms=0.029, mem=77024.00KB
 2025-11-20 16:48:27, mode=PVAI, level=Easy, move=1, ms=0.115, mem=72168.00KB
+2025-11-21 10:40:20, mode=PVAI, level=Easy, move=1, ms=0.397, mem=81628.00KB
+2025-11-21 10:40:21, mode=PVAI, level=Easy, move=2, ms=0.230, mem=81672.00KB
+2025-11-21 10:40:21, mode=PVAI, level=Easy, move=3, ms=0.036, mem=81416.00KB
+2025-11-21 10:40:22, mode=PVAI, level=Easy, move=4, ms=0.009, mem=81416.00KB
