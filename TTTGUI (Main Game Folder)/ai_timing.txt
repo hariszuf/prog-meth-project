@@ -1230,3 +1230,10 @@
 2025-11-16 22:11:38, mode=PVAI, level=Hard, move=1, ms=2.272, mem=69964.00KB
 2025-11-16 22:11:38, mode=PVAI, level=Hard, move=2, ms=0.037, mem=69964.00KB
 2025-11-16 22:11:39, mode=PVAI, level=Hard, move=3, ms=0.003, mem=69964.00KB
+2025-11-18 09:30:48, mode=PVAI, level=Medium, move=1, ms=0.002, mem=85952.00KB
+2025-11-18 09:30:49, mode=PVAI, level=Medium, move=2, ms=0.002, mem=86072.00KB
+2025-11-18 09:30:49, mode=PVAI, level=Medium, move=3, ms=0.002, mem=86328.00KB
+2025-11-18 09:30:52, mode=PVAI, level=Medium, move=1, ms=0.002, mem=87680.00KB
+2025-11-18 09:30:52, mode=PVAI, level=Medium, move=2, ms=0.003, mem=87872.00KB
+2025-11-18 09:30:53, mode=PVAI, level=Medium, move=3, ms=0.002, mem=88128.00KB
+2025-11-18 09:30:55, mode=PVAI, level=Medium, move=4, ms=0.002, mem=88960.00KB

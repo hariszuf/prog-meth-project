@@ -1,0 +1,179 @@
+========================================
+9x9 ERROR MATRIX - COMBINED ANALYSIS
+========================================
+All Models Comparison on Test Dataset
+Dataset: test_non_terminal.data (904 samples)
+Date: November 21, 2025
+
+========================================
+OVERALL ERROR RATES
+========================================
+
+1. Linear Regression:  53.43% error rate
+2. Q-Learning:         54.08% error rate  
+3. Naive Bayes:        76.32% error rate
+
+========================================
+KEY FINDINGS
+========================================
+
+CENTER POSITION (C) WEAKNESS:
+All models struggle significantly when the center position is occupied.
+The center appears in 9 of the top 10 highest error combinations for each model.
+
+Linear Regression - Center Error Rate:
+  - TM + C: 58.9%
+  - C + MR: 58.1%
+  - ML + C: 56.9%
+  - TR + C: 56.0%
+  - TL + C: 55.8%
+
+Q-Learning - Center Error Rate:
+  - ML + C: 62.2%
+  - TM + C: 61.8%
+  - TL + C: 60.7%
+  - C + BR: 59.9%
+  - C + C: 59.8%
+
+Naive Bayes - Center Error Rate:
+  - Generally high errors (72-79%) across all position pairs
+  - Doesn't learn positional strategy effectively
+
+========================================
+CORNER STRATEGY ANALYSIS
+========================================
+
+Bottom Right (BR) Corner:
+- Naive Bayes struggles most: ML+BR (79.6%), BL+BR (78.4%), TR+BR (77.5%)
+- Linear Regression: 52-55% error (moderate confusion)
+- Q-Learning: 51-55% error (moderate confusion)
+
+Middle Left (ML) Position:
+- Naive Bayes: ML+BR (79.6%), ML+BM (79.1%), TR+ML (78.6%)
+- Q-Learning: ML+C (62.2%) - highest error combination
+- Linear Regression: ML+C (56.9%), ML+MR (55.5%)
+
+========================================
+MODEL COMPARISON
+========================================
+
+LINEAR REGRESSION (Best Overall):
+- Lowest error rate: 53.43%
+- Most problematic: Center interactions (55-59% error)
+- Best performance: Corner positions alone (~50-51% error)
+- Learned weak spatial patterns but better than alternatives
+
+Q-LEARNING (Second Best):
+- Error rate: 54.08% (slightly worse than Linear Regression)
+- Severe center blindness: 57-62% error when center involved
+- Good corner recognition: 49-54% error
+- Optimized for gameplay, not static classification
+
+NAIVE BAYES (Worst):
+- Highest error rate: 76.32%
+- Failed to learn positional strategy
+- Consistently high errors (72-80%) across all positions
+- Binary prediction bias (rarely predicts draws)
+
+========================================
+POSITION-PAIR ERROR HEAT MAP SUMMARY
+========================================
+
+Lowest Error Positions (Best Predictions):
+- TR + BL: 48.9% (Q-Learning) - Best single combination
+- TL + BL: 50.8% (Linear Regression)
+- TR + ML: 49.9% (Linear Regression)
+
+Highest Error Positions (Most Confusion):
+- ML + BR: 79.6% (Naive Bayes) - Worst combination
+- ML + BM: 79.1% (Naive Bayes)
+- ML + C: 62.2% (Q-Learning)
+
+========================================
+STRATEGIC INSIGHTS
+========================================
+
+1. CENTER DOMINANCE PROBLEM:
+   All models fail to properly evaluate center position importance.
+   In Tic-Tac-Toe strategy, center is crucial, but models show 
+   55-62% error rates when center is involved.
+
+2. CORNER STRATEGY RECOGNITION:
+   Linear Regression and Q-Learning show moderate corner understanding
+   (~50-53% error), but this is still barely better than random (50%).
+
+3. NAIVE BAYES FAILURE:
+   76% error rate indicates Naive Bayes assumption of feature 
+   independence is invalid for Tic-Tac-Toe, where position 
+   interactions are critical.
+
+4. MODEL SUITABILITY:
+   - Static Classification: Linear Regression performs best
+   - Gameplay (sequential): Q-Learning excels (despite high error here)
+   - Avoid: Naive Bayes for any Tic-Tac-Toe task
+
+========================================
+RECOMMENDATIONS
+========================================
+
+1. FEATURE ENGINEERING:
+   Add explicit features for:
+   - Center occupancy state
+   - Corner pair formations (TL+BR, TR+BL)
+   - Line completion potential (rows, columns, diagonals)
+
+2. MODEL ENHANCEMENTS:
+   - Linear Regression: Add polynomial features for position interactions
+   - Q-Learning: Separate evaluation for static vs sequential decisions
+   - Naive Bayes: Consider Bayesian Networks to model dependencies
+
+3. TRAINING IMPROVEMENTS:
+   - Increase center position weight in loss function
+   - Augment dataset with strategic position importance labels
+   - Use domain knowledge to guide feature importance
+
+4. EVALUATION CONTEXT:
+   - Use Q-Learning for actual gameplay (where it excels)
+   - Use Linear Regression for outcome prediction
+   - Consider ensemble methods combining model strengths
+
+========================================
+TECHNICAL NOTES
+========================================
+
+Error Matrix Calculation:
+- Only counts position pairs where both positions are occupied
+- Error = (predicted_label != actual_label)
+- Minimum 10 samples required for "Top 10" ranking reliability
+
+Position Labels:
+  TL = Top Left       TM = Top Middle      TR = Top Right
+  ML = Middle Left    C = Center           MR = Middle Right
+  BL = Bottom Left    BM = Bottom Middle   BR = Bottom Right
+
+Dataset Format:
+- Character format: x (player), o (opponent), b (blank)
+- Labels: win (+1), draw (0), lose (-1)
+- Non-terminal positions only (game still in progress)
+
+========================================
+CONCLUSION
+========================================
+
+The 9x9 error matrix reveals that all models struggle with:
+1. Center position evaluation (55-62% error)
+2. Position interaction understanding (low variance across pairs)
+3. Strategic pattern recognition (near-random performance)
+
+Linear Regression achieves the lowest error rate (53.43%) but still
+performs only marginally better than random guessing (50%). This 
+indicates fundamental limitations in the models' ability to learn
+Tic-Tac-Toe spatial strategy from static board positions alone.
+
+The high center-related error rates across all models suggest that
+position importance is not being captured by current feature 
+representations. Future work should focus on explicit strategic 
+feature engineering rather than relying on models to discover 
+these patterns from raw position data.
+
+========================================
