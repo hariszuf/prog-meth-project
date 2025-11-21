@@ -5,12 +5,14 @@
 #include "game.h"
 #include "stats.h"
 
+//Define pop up window sizr and size of tic tac toe grid
 #define W_WIDTH 620
 #define W_HEIGHT 720
 #define CELL_SIZE 150
 #define GRID_OFF_X 80
 #define GRID_OFF_Y 140
 
+// Check where is the cursor and what happens when cursor is clicked
 static bool DrawButton(Rectangle r, const char* label, Color bg, Color fg)
 {
     Vector2 m = GetMousePosition();
@@ -24,6 +26,7 @@ static bool DrawButton(Rectangle r, const char* label, Color bg, Color fg)
     return (hot && IsMouseButtonPressed(MOUSE_LEFT_BUTTON));
 }
 
+// Draw Grid for tic tac toe
 static void DrawBoardGrid()
 {
     int thickness = 4;
@@ -90,7 +93,6 @@ int main(void)
         bool clickConsumed = false;
         int x = 20, y = 20, gap = 30, btnH = 40;
 
-        // --- UI Layout Calculation ---
         int wPVP = MeasureText("Player vs Player", 20) + 20;
         int wAI = MeasureText("Player vs AI", 20) + 20;
         Rectangle bPVP = {(float)x, (float)y, (float)wPVP, (float)btnH};
@@ -109,7 +111,7 @@ int main(void)
             bH = (Rectangle){(float)x, (float)y, (float)wH, (float)btnH}; x += wH + gap;
         }
 
-        // --- Input Handling (Buttons) ---
+        // Buttons for UI
         if (DrawButton(bPVP, "Player vs Player", (mode == 0 ? BLUE : LIGHTGRAY), BLACK))
         {
             mode = 0; game_reset(&g); recorded = 0; ai_move_no = 0; clickConsumed = true;
@@ -131,7 +133,7 @@ int main(void)
             game_reset(&g); recorded = 0; ai_move_no = 0;
         }
 
-        // --- Input Handling (Game Board) ---
+        // Input Handling
         if (!clickConsumed && g.winner == 0 && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
         {
             Vector2 mpos = GetMousePosition();
@@ -150,7 +152,7 @@ int main(void)
             }
         }
 
-        // --- AI Logic ---
+        // AI logic flow
         if (mode == 1 && g.winner == 0 && g.turn == 'O')
         {
             double t0 = GetTime();
@@ -162,7 +164,7 @@ int main(void)
             game_check_end(&g);
         }
 
-        // --- Stats & Sound ---
+        // Stats & Sound
         if (g.winner != 0 && !recorded)
         {
             int code = (g.winner == 1) ? 1 : (g.winner == 2) ? 2 : 0;
@@ -174,7 +176,7 @@ int main(void)
             else if (g.winner == 2 && mode == 1) PlaySound(loseSound);
         }
 
-        // --- Drawing ---
+        // Set background to white
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
