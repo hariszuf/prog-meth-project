@@ -24,7 +24,7 @@ Before you can run the game, ensure you have the following installed:
 
 ##### Navigate to the Project Folder
 1. Open your terminal (or command prompt).
-2. Navigate to the folder where the project files are stored.
+2. Navigate to the folder where the project files(TTTGUI Main Game Folder) are stored.
 
 ##### Compile the Game
 To compile the source code, run the `compile.bat` batch file. This will automatically compile the source code and create the executable.
@@ -33,20 +33,21 @@ To compile the source code, run the `compile.bat` batch file. This will automati
 compile.bat 
 ```
 
-##### Compile the Game
+##### Run the Game
 After running the compile.bat, the executable ttt_gui.exe will be ready to run.
+```bash
 ./ttt_gui.exe
+```
 
-
-#Gameplay Instructions
+#####Gameplay Instructions
 
 Select Difficulty:
 
-Easy: AI uses Imperfect Minimax for a simpler challenge.
+1. Easy: AI uses Imperfect Minimax for a simpler challenge.
 
-Medium: AI uses Q-Learning for a more strategic challenge.
+2. Medium: AI uses Q-Learning for a more strategic challenge.
 
-Hard: AI uses Perfect Minimax for the toughest challenge.
+3. Hard: AI uses Perfect Minimax for the toughest challenge.
 
 PvP Mode: Challenge another player in a two-player game mode.
 
