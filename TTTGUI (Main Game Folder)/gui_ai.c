@@ -114,18 +114,42 @@ int main(void)
         // Buttons for UI
         if (DrawButton(bPVP, "Player vs Player", (mode == 0 ? BLUE : LIGHTGRAY), BLACK))
         {
-            mode = 0; game_reset(&g); recorded = 0; ai_move_no = 0; clickConsumed = true;
+            mode = 0;
+            game_reset(&g);  // Reset game when switching to PvP mode
+            recorded = 0;
+            ai_move_no = 0;
+            clickConsumed = true;
         }
+
         if (DrawButton(bAI, "Player vs AI", (mode == 1 ? RED : LIGHTGRAY), BLACK))
         {
-            mode = 1; game_reset(&g); recorded = 0; ai_move_no = 0; clickConsumed = true;
+            mode = 1;
+            game_reset(&g);  // Reset game when switching to PvAI mode
+            recorded = 0;
+            ai_move_no = 0;
+            clickConsumed = true;
         }
+
 
         if (mode == 1)
         {
-            if (DrawButton(bE, "E", (level == 1 ? GREEN : LIGHTGRAY), BLACK)) { level = 1; clickConsumed = true; }
-            if (DrawButton(bM, "M", (level == 2 ? ORANGE : LIGHTGRAY), BLACK)) { level = 2; clickConsumed = true; }
-            if (DrawButton(bH, "H", (level == 3 ? RED : LIGHTGRAY), BLACK)) { level = 3; clickConsumed = true; }
+            if (DrawButton(bE, "E", (level == 1 ? GREEN : LIGHTGRAY), BLACK)) { 
+                level = 1; 
+                game_reset(&g); 
+                clickConsumed = true; 
+            }
+
+            if (DrawButton(bM, "M", (level == 2 ? ORANGE : LIGHTGRAY), BLACK)) { 
+                level = 2; 
+                game_reset(&g);  
+                clickConsumed = true; 
+            }
+
+            if (DrawButton(bH, "H", (level == 3 ? RED : LIGHTGRAY), BLACK)) { 
+                level = 3; 
+                game_reset(&g);  
+                clickConsumed = true; 
+            }
         }
 
         if (IsKeyPressed(KEY_R))
@@ -260,7 +284,7 @@ int main(void)
 
         EndDrawing();
     }
-
+    stats_reset_pvp();
     UnloadSound(winSound);
     UnloadSound(loseSound);
     CloseAudioDevice();
