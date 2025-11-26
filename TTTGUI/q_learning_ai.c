@@ -1,10 +1,8 @@
-// q_learning_ai.c - Q-Learning AI implementation for Tic-Tac-Toe
 #include "q_learning_ai.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-// Hash function for board state
 static unsigned long hash_board(char board[9]) {
     unsigned long hash = 5381;
     for (int i = 0; i < 9; i++) {
@@ -13,7 +11,6 @@ static unsigned long hash_board(char board[9]) {
     return hash % Q_TABLE_SIZE;
 }
 
-// Initialize Q-table
 static void init_qtable(QLearningModel *model) {
     for (int i = 0; i < Q_TABLE_SIZE; i++) {
         model->table[i] = NULL;
@@ -21,7 +18,6 @@ static void init_qtable(QLearningModel *model) {
     model->total_entries = 0;
 }
 
-// Get Q-value for state-action pair
 static double get_q_value(const QLearningModel *model, char board[9], int action) {
     unsigned long hash = hash_board(board);
     QEntry *entry = model->table[hash];
@@ -34,10 +30,9 @@ static double get_q_value(const QLearningModel *model, char board[9], int action
         entry = entry->next;
     }
     
-    return 0.0; // Default Q-value for unseen state-action
+    return 0.0;
 }
 
-// Add Q-table entry
 static void add_q_entry(QLearningModel *model, char board[9], int action, double q_value, int visits) {
     unsigned long hash = hash_board(board);
     
@@ -51,7 +46,6 @@ static void add_q_entry(QLearningModel *model, char board[9], int action, double
     model->total_entries++;
 }
 
-// Load Q-Learning model from file
 int ql_load_model(const char *filename, QLearningModel *model) {
     FILE *fp = fopen(filename, "r");
     if (!fp) {
@@ -62,12 +56,10 @@ int ql_load_model(const char *filename, QLearningModel *model) {
     init_qtable(model);
     
     char line[256];
-    // Skip header lines
     while (fgets(line, sizeof(line), fp)) {
         if (line[0] != '#') break;
     }
     
-    // Read Q-table entries (format: b,o,o,x,b,x,o,x,b,8,0.800000,1)
     int entries_loaded = 0;
     do {
         if (line[0] == '#' || line[0] == '\n') continue;
@@ -76,14 +68,12 @@ int ql_load_model(const char *filename, QLearningModel *model) {
         int action, visits;
         double q_value;
         
-        // Parse board state (9 cells)
         char *token = strtok(line, ",");
         for (int i = 0; i < 9 && token != NULL; i++) {
             board[i] = token[0];
             token = strtok(NULL, ",");
         }
         
-        // Parse action, q_value, visits
         if (token != NULL) {
             action = atoi(token);
             token = strtok(NULL, ",");
@@ -104,7 +94,6 @@ int ql_load_model(const char *filename, QLearningModel *model) {
     return (model->total_entries > 0);
 }
 
-// Convert board from game format to Q-learning format
 static void convert_board_format(const char *game_board, char *q_board) {
     for (int i = 0; i < 9; i++) {
         if (game_board[i] == 'X') {
@@ -112,17 +101,15 @@ static void convert_board_format(const char *game_board, char *q_board) {
         } else if (game_board[i] == 'O') {
             q_board[i] = 'o';
         } else {
-            q_board[i] = 'b';  // blank
+            q_board[i] = 'b';
         }
     }
 }
 
-// Find best move for 'O' using Q-Learning
 int ql_find_best_move(const QLearningModel *model, char board[9]) {
     int empty_cells[9];
     int empty_count = 0;
     
-    // Find all empty cells
     for (int i = 0; i < 9; i++) {
         if (board[i] != 'X' && board[i] != 'O') {
             empty_cells[empty_count++] = i;
@@ -130,14 +117,11 @@ int ql_find_best_move(const QLearningModel *model, char board[9]) {
     }
     
     if (empty_count == 0) {
-        return -1; // No valid moves
+        return -1;
     }
-    
-    // Convert board to Q-learning format (lowercase, 'b' for blank)
     char q_board[9];
     convert_board_format(board, q_board);
     
-    // Find move with highest Q-value
     int best_move = empty_cells[0];
     double best_q = -1000.0;
     
@@ -154,7 +138,6 @@ int ql_find_best_move(const QLearningModel *model, char board[9]) {
     return best_move;
 }
 
-// Free Q-Learning model memory
 void ql_free_model(QLearningModel *model) {
     for (int i = 0; i < Q_TABLE_SIZE; i++) {
         QEntry *entry = model->table[i];

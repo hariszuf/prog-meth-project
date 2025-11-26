@@ -1,10 +1,7 @@
-// linear_regression_ai.h - Linear Regression AI for Tic-Tac-Toe
 #ifndef LINEAR_REGRESSION_AI_H
 #define LINEAR_REGRESSION_AI_H
 
-#define NUM_FEATURES 10  // 9 board positions + 1 bias term
-
-// Linear Regression model structure
+#define NUM_FEATURES 10
 typedef struct {
     double weights[NUM_FEATURES];
 } LinearRegressionModel;
