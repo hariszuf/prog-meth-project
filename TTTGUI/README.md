@@ -39,7 +39,7 @@ After running the compile.bat, the executable ttt_gui.exe will be ready to run.
 ./ttt_gui.exe
 ```
 
-#####Gameplay Instructions
+Gameplay Instructions
 
 Select Difficulty:
 
