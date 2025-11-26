@@ -1,4 +1,3 @@
-// evaluate_all_models.c - Comprehensive evaluation of all AI models
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

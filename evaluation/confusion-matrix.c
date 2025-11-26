@@ -1,4 +1,3 @@
-// confusion-matrix.c - Evaluate ML models with confusion matrix analysis
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,18 +7,14 @@
 #define MAX_SAMPLES 10000
 #define FEATURE_COUNT 9
 
-// ============================
-// DATA STRUCTURES
-// ============================
-
 typedef enum {
-    FORMAT_CHARACTER,  // x, o, b, win/lose/draw
-    FORMAT_MATRIX      // 1.0, -1.0, 0.0, +1/-1
+    FORMAT_CHARACTER,
+    FORMAT_MATRIX
 } DatasetFormat;
 
 typedef struct {
     double features[FEATURE_COUNT];
-    int label;  // +1 for win, -1 for lose, 0 for draw
+    int label;
 } Sample;
 
 typedef struct {
@@ -30,37 +25,32 @@ typedef struct {
 } Dataset;
 
 typedef struct {
-    // 3x3 Confusion Matrix for Win/Draw/Lose
-    int win_pred_win;      // Predicted Win, Actual Win (TP for win)
-    int win_pred_draw;     // Predicted Win, Actual Draw
-    int win_pred_lose;     // Predicted Win, Actual Lose (FP for win)
-    
-    int draw_pred_win;     // Predicted Draw, Actual Win
-    int draw_pred_draw;    // Predicted Draw, Actual Draw (TP for draw)
-    int draw_pred_lose;    // Predicted Draw, Actual Lose
-    
-    int lose_pred_win;     // Predicted Lose, Actual Win (FN for win)
-    int lose_pred_draw;    // Predicted Lose, Actual Draw
-    int lose_pred_lose;    // Predicted Lose, Actual Lose (TN for win, TP for lose)
+    int win_pred_win;
+    int win_pred_draw;
+    int win_pred_lose;
+    int draw_pred_win;
+    int draw_pred_draw;
+    int draw_pred_lose;
+    int lose_pred_win;
+    int lose_pred_draw;
+    int lose_pred_lose;
 } ConfusionMatrix;
 
-// Per-position statistics
 typedef struct {
-    int count;             // Number of samples with this position state
-    int pred_win;          // Predicted Win
-    int pred_draw;         // Predicted Draw
-    int pred_lose;         // Predicted Lose
+    int count;
+    int pred_win;
+    int pred_draw;
+    int pred_lose;
 } PositionStats;
 
 typedef struct {
-    PositionStats x_state[FEATURE_COUNT];   // When position has X
-    PositionStats o_state[FEATURE_COUNT];   // When position has O
-    PositionStats b_state[FEATURE_COUNT];   // When position is blank
+    PositionStats x_state[FEATURE_COUNT];
+    PositionStats o_state[FEATURE_COUNT];
+    PositionStats b_state[FEATURE_COUNT];
 } PerPositionAnalysis;
 
-// Move-based analysis: 9 positions × 9 positions interaction
 typedef struct {
-    int pred_win[FEATURE_COUNT][FEATURE_COUNT];   // When pos[i]=X and pos[j]=state
+    int pred_win[FEATURE_COUNT][FEATURE_COUNT];
     int pred_draw[FEATURE_COUNT][FEATURE_COUNT];
     int pred_lose[FEATURE_COUNT][FEATURE_COUNT];
     int count[FEATURE_COUNT][FEATURE_COUNT];

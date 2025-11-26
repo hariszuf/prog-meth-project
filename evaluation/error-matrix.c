@@ -1,5 +1,3 @@
-// error-matrix.c - Generate 9x9 error matrices for model evaluation
-// Shows which position combinations cause prediction errors
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,18 +8,14 @@
 #define FEATURE_COUNT 9
 #define Q_TABLE_SIZE 10007
 
-// ============================
-// DATA STRUCTURES
-// ============================
-
 typedef enum {
-    FORMAT_CHARACTER,  // x, o, b, win/lose/draw
-    FORMAT_MATRIX      // 1.0, -1.0, 0.0, +1/-1
+    FORMAT_CHARACTER,
+    FORMAT_MATRIX
 } DatasetFormat;
 
 typedef struct {
     double features[FEATURE_COUNT];
-    int label;  // +1 for win, -1 for lose, 0 for draw
+    int label;
 } Sample;
 
 typedef struct {
@@ -31,11 +25,10 @@ typedef struct {
     DatasetFormat format;
 } Dataset;
 
-// 9x9 Error Matrix: tracks errors for each position pair
 typedef struct {
-    int errors[FEATURE_COUNT][FEATURE_COUNT];    // Error count when both positions occupied
-    int total[FEATURE_COUNT][FEATURE_COUNT];     // Total samples with both positions occupied
-    double error_rate[FEATURE_COUNT][FEATURE_COUNT]; // Percentage of errors
+    int errors[FEATURE_COUNT][FEATURE_COUNT];
+    int total[FEATURE_COUNT][FEATURE_COUNT];
+    double error_rate[FEATURE_COUNT][FEATURE_COUNT];
 } ErrorMatrix;
 
 // ============================

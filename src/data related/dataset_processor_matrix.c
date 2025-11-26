@@ -1,24 +1,3 @@
-/*
- * dataset_processor_matrix.c
- * 
- * Matrix-based dataset processor following strict academic specification:
- * - Features stored as 2D array: X[m][n] where m=rows, n=9 features
- * - Outcomes stored as 1D array: y[m] where values are +1 (win) or -1 (lose)
- * - Draws are excluded from training data (binary classification only)
- * 
- * DIFFERENCES FROM dataset_processor.c:
- * 1. Uses proper matrix format instead of array of structures
- * 2. Binary classification only (win/lose) - excludes draws
- * 3. Numerical encoding: +1 for win, -1 for lose (instead of 'w', 'l', 'd')
- * 4. Direct matrix operations possible (suitable for linear algebra)
- * 
- * IMPACT ON MODELS:
- * - Better suited for mathematical ML algorithms
- * - More efficient memory access patterns
- * - Cleaner separation of features and labels
- * - Standard format for most ML libraries
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,8 +26,6 @@ void displayMatrixSample(MatrixDataset *dataset, int index);
 double encodeFeature(char c);
 char decodeFeature(double val);
 
-// Encode feature to numerical value
-// x -> 1.0, o -> -1.0, b -> 0.0
 double encodeFeature(char c) {
     switch(c) {
         case 'x': return 1.0;
@@ -58,19 +35,16 @@ double encodeFeature(char c) {
     }
 }
 
-// Decode numerical value back to character (for display)
 char decodeFeature(double val) {
     if (val > 0.5) return 'x';
     if (val < -0.5) return 'o';
     return 'b';
 }
 
-// Initialize matrix dataset with dynamic memory allocation
 void initMatrixDataset(MatrixDataset *dataset, int max_samples) {
     dataset->num_features = FEATURES;
     dataset->num_samples = 0;
     
-    // Allocate 2D array for features X[m][n]
     dataset->X = (double **)malloc(max_samples * sizeof(double *));
     if (dataset->X == NULL) {
         fprintf(stderr, "Error: Memory allocation failed for feature matrix\n");
@@ -85,7 +59,6 @@ void initMatrixDataset(MatrixDataset *dataset, int max_samples) {
         }
     }
     
-    // Allocate 1D array for outcomes y[m]
     dataset->y = (int *)malloc(max_samples * sizeof(int));
     if (dataset->y == NULL) {
         fprintf(stderr, "Error: Memory allocation failed for outcome vector\n");
@@ -96,10 +69,8 @@ void initMatrixDataset(MatrixDataset *dataset, int max_samples) {
            max_samples, FEATURES, max_samples);
 }
 
-// Free matrix dataset memory
 void freeMatrixDataset(MatrixDataset *dataset) {
     if (dataset->X != NULL) {
-        // Free each row
         for (int i = 0; i < MAX_SAMPLES; i++) {
             if (dataset->X[i] != NULL) {
                 free(dataset->X[i]);
@@ -117,8 +88,6 @@ void freeMatrixDataset(MatrixDataset *dataset) {
     dataset->num_samples = 0;
 }
 
-// Read dataset file and convert to matrix format
-// Extracts (x_{m,1}, x_{m,2}, ..., x_{m,9}, y_{m,1}) into X[m][n] and y[m]
 int readDatasetToMatrix(const char *filename, MatrixDataset *dataset) {
     FILE *fp = fopen(filename, "r");
     if (fp == NULL) {
@@ -129,11 +98,13 @@ int readDatasetToMatrix(const char *filename, MatrixDataset *dataset) {
     char line[256];
     int line_num = 0;
     int valid_samples = 0;
-    int skipped_draws = 0;
+    int win_count = 0;
+    int draw_count = 0;
+    int lose_count = 0;
     
     printf("\nReading dataset into matrix format...\n");
     printf("Format: X[m][n] where m=samples, n=9 features\n");
-    printf("        y[m] where values are +1 (win) or -1 (lose)\n\n");
+    printf("        y[m] where values are +1 (win), 0 (draw), or -1 (lose)\n\n");
     
     // Read each line from the file
     while (fgets(line, sizeof(line), fp) != NULL && valid_samples < MAX_SAMPLES) {
@@ -187,15 +158,17 @@ int readDatasetToMatrix(const char *filename, MatrixDataset *dataset) {
             continue;
         }
         
-        // CRITICAL: Binary classification only - skip draws
+        // TERNARY classification - includes draws
         int outcome;
         if (strcmp(token, "win") == 0) {
-            outcome = +1;  // Positive class
+            outcome = +1;  // Win
+            win_count++;
         } else if (strcmp(token, "lose") == 0) {
-            outcome = -1;  // Negative class
+            outcome = -1;  // Lose
+            lose_count++;
         } else if (strcmp(token, "draw") == 0) {
-            skipped_draws++;
-            continue;  // Skip draws for binary classification
+            outcome = 0;   // Draw - INCLUDED for multi-class learning
+            draw_count++;
         } else {
             fprintf(stderr, "Warning: Invalid outcome '%s' at line %d, skipping\n", 
                     token, line_num);
@@ -218,9 +191,9 @@ int readDatasetToMatrix(const char *filename, MatrixDataset *dataset) {
     dataset->num_samples = valid_samples;
     
     printf("Successfully loaded %d samples from %s\n", valid_samples, filename);
-    printf("  - Win samples: stored as y[m] = +1\n");
-    printf("  - Lose samples: stored as y[m] = -1\n");
-    printf("  - Draw samples: %d (excluded from binary classification)\n", skipped_draws);
+    printf("  - Win samples: %d (y[m] = +1, %.1f%%)\n", win_count, 100.0 * win_count / valid_samples);
+    printf("  - Draw samples: %d (y[m] = 0, %.1f%%)\n", draw_count, 100.0 * draw_count / valid_samples);
+    printf("  - Lose samples: %d (y[m] = -1, %.1f%%)\n", lose_count, 100.0 * lose_count / valid_samples);
     printf("\nMatrix dimensions: X[%d][%d], y[%d]\n", 
            valid_samples, FEATURES, valid_samples);
     
@@ -324,7 +297,7 @@ int saveMatrixDataset(const char *filename, MatrixDataset *dataset) {
     // Write header comment
     fprintf(fp, "# Matrix dataset format: x1,x2,x3,x4,x5,x6,x7,x8,x9,outcome\n");
     fprintf(fp, "# Features encoded as: x=1.0, o=-1.0, b=0.0\n");
-    fprintf(fp, "# Outcomes: win=+1, lose=-1\n");
+    fprintf(fp, "# Outcomes: win=+1, draw=0, lose=-1\n");
     
     for (int m = 0; m < dataset->num_samples; m++) {
         // Write features X[m][n]
@@ -453,11 +426,11 @@ int main(int argc, char *argv[]) {
     printf("\n");
     printf("========================================\n");
     printf("MATRIX-BASED DATASET PROCESSOR\n");
-    printf("Binary Classification (Win/Lose Only)\n");
+    printf("Ternary Classification (Win/Draw/Lose)\n");
     printf("========================================\n");
     printf("\n");
     printf("Format: X[m][n] where m=samples, n=9\n");
-    printf("        y[m] where values ∈ {+1, -1}\n");
+    printf("        y[m] where values ∈ {+1, 0, -1}\n");
     printf("\n");
     
     // Get input filename
@@ -471,19 +444,19 @@ int main(int argc, char *argv[]) {
     
     // Determine output filenames based on input
     if (strstr(input_filename, "non-terminal") != NULL) {
-        strcpy(train_filename, "../dataset/new processed/train_non_terminal_matrix.data");
-        strcpy(test_filename, "../dataset/new processed/test_non_terminal_matrix.data");
-        strcpy(report_filename, "../dataset/new results/report_non_terminal_matrix.txt");
+        strcpy(train_filename, "../../dataset/new processed/train_non_terminal_matrix.data");
+        strcpy(test_filename, "../../dataset/new processed/test_non_terminal_matrix.data");
+        strcpy(report_filename, "../../dataset/new results/report_non_terminal_matrix.txt");
         printf("📊 Processing NON-TERMINAL dataset (matrix format)\n\n");
     } else if (strstr(input_filename, "complete") != NULL) {
-        strcpy(train_filename, "../dataset/new processed/train_combined_matrix.data");
-        strcpy(test_filename, "../dataset/new processed/test_combined_matrix.data");
-        strcpy(report_filename, "../dataset/new results/report_combined_matrix.txt");
+        strcpy(train_filename, "../../dataset/new processed/train_combined_matrix.data");
+        strcpy(test_filename, "../../dataset/new processed/test_combined_matrix.data");
+        strcpy(report_filename, "../../dataset/new results/report_combined_matrix.txt");
         printf("📊 Processing COMBINED dataset (matrix format)\n\n");
     } else {
-        strcpy(train_filename, "../dataset/new processed/train_matrix.data");
-        strcpy(test_filename, "../dataset/new processed/test_matrix.data");
-        strcpy(report_filename, "../dataset/new results/report_matrix.txt");
+        strcpy(train_filename, "../../dataset/new processed/train_matrix.data");
+        strcpy(test_filename, "../../dataset/new processed/test_matrix.data");
+        strcpy(report_filename, "../../dataset/new results/report_matrix.txt");
         printf("📊 Processing dataset (matrix format)\n\n");
     }
     
@@ -567,11 +540,11 @@ int main(int argc, char *argv[]) {
     printf("  - %s\n", report_filename);
     printf("\nMatrix format:\n");
     printf("  Features: X[m][n] = numerical values\n");
-    printf("  Outcomes: y[m] = {+1, -1}\n");
+    printf("  Outcomes: y[m] = {+1, 0, -1}\n");
     printf("\nKey differences from standard processor:\n");
     printf("  ✓ True matrix format (2D array + 1D array)\n");
     printf("  ✓ Numerical encoding (not characters)\n");
-    printf("  ✓ Binary classification (draws excluded)\n");
+    printf("  ✓ Ternary classification (includes draws)\n");
     printf("  ✓ Standard ML notation (X, y)\n");
     printf("  ✓ Direct linear algebra ready\n");
     

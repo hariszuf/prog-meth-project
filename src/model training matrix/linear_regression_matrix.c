@@ -1,13 +1,3 @@
-/*
- * linear_regression_matrix.c
- * 
- * Linear Regression training for MATRIX format datasets
- * Compatible with dataset_processor_matrix.c output
- * 
- * Input format: X[m][n] as numerical values, y[m] as {+1, -1}
- * Example: 1.0,-1.0,0.0,1.0,1.0,-1.0,0.0,0.0,1.0,+1
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,22 +5,17 @@
 #include <time.h>
 
 #define MAX_INSTANCES 10000
-#define NUM_FEATURES 10  // 9 board positions + 1 bias term
+#define NUM_FEATURES 10
 #define MAX_LINE_LENGTH 256
 
-// Instance structure
 typedef struct {
-    double features[NUM_FEATURES];  // features[0] = bias (1.0), features[1-9] = board state
-    double label;  // +1 for win, -1 for lose
+    double features[NUM_FEATURES];
+    double label;
 } Instance;
 
-// Model structure
 typedef struct {
     double weights[NUM_FEATURES];
 } LinearModel;
-
-// Load matrix format data from file
-// Format: 1.0,-1.0,0.0,1.0,1.0,-1.0,0.0,0.0,1.0,+1
 int load_matrix_data(const char *filename, Instance *data) {
     FILE *file = fopen(filename, "r");
     if (!file) {
@@ -44,7 +29,6 @@ int load_matrix_data(const char *filename, Instance *data) {
     printf("Loading matrix format data from %s...\n", filename);
     
     while (fgets(line, sizeof(line), file) && count < MAX_INSTANCES) {
-        // Skip comment lines
         if (line[0] == '#') {
             continue;
         }
@@ -55,7 +39,6 @@ int load_matrix_data(const char *filename, Instance *data) {
             continue;
         }
         
-        // Parse matrix format: feature1,feature2,...,feature9,outcome
         double f[9];
         int outcome;
         
@@ -68,12 +51,11 @@ int load_matrix_data(const char *filename, Instance *data) {
             continue;
         }
         
-        // Store features with bias term
-        data[count].features[0] = 1.0;  // Bias term
+        data[count].features[0] = 1.0;
         for (int i = 0; i < 9; i++) {
             data[count].features[i + 1] = f[i];
         }
-        data[count].label = (double)outcome;  // +1 or -1
+        data[count].label = (double)outcome;
         
         count++;
     }

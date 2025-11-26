@@ -1,15 +1,3 @@
-/*
- * naive_bayes_matrix.c
- * 
- * Naive Bayes training for MATRIX format datasets
- * Compatible with dataset_processor_matrix.c output
- * 
- * Input format: X[m][n] as numerical values, y[m] as {+1, -1}
- * Example: 1.0,-1.0,0.0,1.0,1.0,-1.0,0.0,0.0,1.0,+1
- * 
- * Treats numerical features as categorical (3 states: -1.0, 0.0, 1.0)
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,32 +5,21 @@
 
 #define MAX_INSTANCES 10000
 #define NUM_FEATURES 9
-#define NUM_STATES 3      // Three possible states: x(1.0), o(-1.0), b(0.0)
-#define NUM_CLASSES 2     // Two classes: win(+1), lose(-1)
+#define NUM_STATES 3
+#define NUM_CLASSES 2
 
-// Instance structure for matrix format
 typedef struct {
-    double features[NUM_FEATURES];  // Numerical features
-    int label;                       // +1 or -1
+    double features[NUM_FEATURES];
+    int label;
 } Instance;
 
-// Naive Bayes model structure
 typedef struct {
-    // P(feature=state | class)
-    // [feature_idx][state_idx][class_idx]
     double feature_prob[NUM_FEATURES][NUM_STATES][NUM_CLASSES];
-    
-    // P(class)
     double class_prob[NUM_CLASSES];
-    
-    // Counts for Laplace smoothing
     int feature_count[NUM_FEATURES][NUM_STATES][NUM_CLASSES];
     int class_count[NUM_CLASSES];
     int total_samples;
 } NaiveBayesModel;
-
-// Convert numerical feature to state index
-// 1.0 (x) -> 0, 0.0 (b) -> 1, -1.0 (o) -> 2
 int feature_to_state(double feature) {
     if (feature > 0.5) return 0;      // x
     if (feature < -0.5) return 2;     // o
@@ -69,7 +46,6 @@ int load_matrix_data(const char *filename, Instance *data) {
     printf("Loading matrix format data from %s...\n", filename);
     
     while (fgets(line, sizeof(line), file) && count < MAX_INSTANCES) {
-        // Skip comment lines
         if (line[0] == '#') {
             continue;
         }
@@ -80,7 +56,6 @@ int load_matrix_data(const char *filename, Instance *data) {
             continue;
         }
         
-        // Parse: feature1,feature2,...,feature9,outcome
         double f[NUM_FEATURES];
         int outcome;
         
@@ -93,7 +68,6 @@ int load_matrix_data(const char *filename, Instance *data) {
             continue;
         }
         
-        // Store data
         for (int i = 0; i < NUM_FEATURES; i++) {
             data[count].features[i] = f[i];
         }

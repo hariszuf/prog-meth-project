@@ -1,10 +1,8 @@
-// linear_regression_ai.c - Linear Regression AI implementation for Tic-Tac-Toe
 #include "linear_regression_ai.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-// Load model from text file
 int lr_load_model(const char *filename, LinearRegressionModel *model) {
     FILE *file = fopen(filename, "r");
     if (!file) {
@@ -15,11 +13,9 @@ int lr_load_model(const char *filename, LinearRegressionModel *model) {
     char line[256];
     int weight_idx = 0;
     
-    // Read weights from file (format: "Weight[0] (label): value")
     while (fgets(line, sizeof(line), file) && weight_idx < NUM_FEATURES) {
         if (strstr(line, "Weight[") != NULL) {
             double weight;
-            // Try to find the colon and read the value after it
             char *colon = strchr(line, ':');
             if (colon != NULL) {
                 if (sscanf(colon + 1, "%lf", &weight) == 1) {
@@ -40,22 +36,20 @@ int lr_load_model(const char *filename, LinearRegressionModel *model) {
     return 1;
 }
 
-// Encode board features for prediction
 static void encode_features(const char *board, double *features) {
-    features[0] = 1.0;  // Bias term
+    features[0] = 1.0;
     
     for (int i = 0; i < 9; i++) {
         if (board[i] == 'X') {
             features[i + 1] = 1.0;
         } else if (board[i] == 'O') {
             features[i + 1] = -1.0;
-        } else {  // Empty cell
+        } else {
             features[i + 1] = 0.0;
         }
     }
 }
 
-// Compute prediction (dot product of weights and features)
 static double lr_predict(const LinearRegressionModel *model, const double *features) {
     double result = 0.0;
     for (int i = 0; i < NUM_FEATURES; i++) {
@@ -64,12 +58,10 @@ static double lr_predict(const LinearRegressionModel *model, const double *featu
     return result;
 }
 
-// Find best move for 'O' using Linear Regression
 int lr_find_best_move(const LinearRegressionModel *model, char board[9]) {
     int empty_cells[9];
     int empty_count = 0;
     
-    // Find all empty cells
     for (int i = 0; i < 9; i++) {
         if (board[i] != 'X' && board[i] != 'O') {
             empty_cells[empty_count++] = i;
@@ -77,27 +69,22 @@ int lr_find_best_move(const LinearRegressionModel *model, char board[9]) {
     }
     
     if (empty_count == 0) {
-        return -1; // No valid moves
+        return -1;
     }
-    
-    // Try each empty cell and evaluate the resulting board state
     int best_move = empty_cells[0];
     double best_score = -1000.0;
     
     for (int i = 0; i < empty_count; i++) {
         int move = empty_cells[i];
         
-        // Create a temporary board with this move
         char temp_board[9];
         memcpy(temp_board, board, 9);
         temp_board[move] = 'O';
         
-        // Encode features and predict
         double features[NUM_FEATURES];
         encode_features(temp_board, features);
         double score = lr_predict(model, features);
         
-        // Higher score = better for O
         if (score > best_score) {
             best_score = score;
             best_move = move;
