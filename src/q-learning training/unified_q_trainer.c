@@ -247,6 +247,35 @@ int minimax_move(char board[BOARD_SIZE], int depth_limit) {
     return best_move;
 }
 
+// Convert numerical feature to character
+char decode_feature(double val) {
+    if (val > 0.5) return PLAYER_X;   // 1.0 -> 'x'
+    if (val < -0.5) return PLAYER_O;  // -1.0 -> 'o'
+    return EMPTY;                      // 0.0 -> 'b'
+}
+
+// Detect file format (character vs matrix)
+int is_matrix_format(const char *filename) {
+    FILE *fp = fopen(filename, "r");
+    if (!fp) return 0;
+    
+    char line[256];
+    while (fgets(line, sizeof(line), fp)) {
+        if (line[0] == '#') continue;  // Skip comments
+        if (strlen(line) < 5) continue;
+        
+        // Matrix format has decimal points and +/- signs
+        int has_decimal = (strchr(line, '.') != NULL);
+        int has_negative = (strchr(line, '-') != NULL && line[0] != '-');
+        
+        fclose(fp);
+        return (has_decimal || has_negative);
+    }
+    
+    fclose(fp);
+    return 0;
+}
+
 void load_dataset_with_minimax_init(const char *filename, QTable *qt) {
     FILE *fp = fopen(filename, "r");
     if (!fp) {
@@ -254,7 +283,11 @@ void load_dataset_with_minimax_init(const char *filename, QTable *qt) {
         return;
     }
     
+    int is_matrix = is_matrix_format(filename);
+    const char *format_type = is_matrix ? "MATRIX" : "CHARACTER";
+    
     printf("Loading dataset: %s\n", filename);
+    printf("Format detected: %s\n", format_type);
     printf("Initializing Q-values with Minimax evaluation...\n");
     
     char line[256];
@@ -262,30 +295,60 @@ void load_dataset_with_minimax_init(const char *filename, QTable *qt) {
     
     while (fgets(line, sizeof(line), fp) != NULL) {
         line[strcspn(line, "\n")] = 0;
-        if (strlen(line) == 0) continue;
+        
+        // Skip comments and empty lines
+        if (strlen(line) == 0 || line[0] == '#') continue;
         
         char board[BOARD_SIZE];
-        char *token = strtok(line, ",");
-        int i = 0;
+        int valid_board = 0;
         
-        while (token != NULL && i < BOARD_SIZE) {
-            board[i++] = token[0];
-            token = strtok(NULL, ",");
+        if (is_matrix) {
+            // Parse matrix format: 1.0,-1.0,0.0,1.0,1.0,-1.0,0.0,0.0,1.0,+1
+            double features[BOARD_SIZE];
+            int outcome;
+            
+            int parsed = sscanf(line, "%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%d",
+                               &features[0], &features[1], &features[2],
+                               &features[3], &features[4], &features[5],
+                               &features[6], &features[7], &features[8],
+                               &outcome);
+            
+            if (parsed == 10) {
+                // Convert numerical features to character board
+                for (int i = 0; i < BOARD_SIZE; i++) {
+                    board[i] = decode_feature(features[i]);
+                }
+                valid_board = 1;
+            }
+        } else {
+            // Parse character format: x,o,b,x,x,o,b,b,x,win
+            char *token = strtok(line, ",");
+            int i = 0;
+            
+            while (token != NULL && i < BOARD_SIZE) {
+                board[i++] = token[0];
+                token = strtok(NULL, ",");
+            }
+            
+            if (i == BOARD_SIZE) {
+                valid_board = 1;
+            }
         }
         
-        if (i == BOARD_SIZE) {
-            boards_processed++;
-            
-            for (int pos = 0; pos < BOARD_SIZE; pos++) {
-                if (board[pos] == EMPTY) {
-                    board[pos] = PLAYER_O;
-                    int minimax_score = minimax(board, 0, 0, 4);
-                    board[pos] = EMPTY;
-                    
-                    double init_q = (minimax_score / 15.0) + ((rand() / (double)RAND_MAX) * 0.05 - 0.025);
-                    update_q_value(qt, board, pos, init_q);
-                    moves_initialized++;
-                }
+        if (!valid_board) continue;
+        
+        // Now process the board (same for both formats)
+        boards_processed++;
+        
+        for (int pos = 0; pos < BOARD_SIZE; pos++) {
+            if (board[pos] == EMPTY) {
+                board[pos] = PLAYER_O;
+                int minimax_score = minimax(board, 0, 0, 4);
+                board[pos] = EMPTY;
+                
+                double init_q = (minimax_score / 15.0) + ((rand() / (double)RAND_MAX) * 0.05 - 0.025);
+                update_q_value(qt, board, pos, init_q);
+                moves_initialized++;
             }
         }
         
@@ -565,6 +628,10 @@ int main(int argc, char *argv[]) {
         printf("  scratch <output_file> [episodes]     - Train from zero\n");
         printf("  dataset <dataset> <output> [episodes] - Init from dataset\n");
         printf("  resume <checkpoint> <output> [episodes] - Resume training\n");
+        printf("\nNotes:\n");
+        printf("  - Dataset can be CHARACTER or MATRIX format (auto-detected)\n");
+        printf("  - Matrix format: 1.0,-1.0,0.0,...,+1\n");
+        printf("  - Character format: x,o,b,...,win\n");
         return 1;
     }
     

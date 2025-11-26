@@ -1,0 +1,48 @@
+========================================
+MATRIX DATASET PROCESSING REPORT
+Binary Classification (Win/Lose Only)
+========================================
+
+DATA FORMAT
+----------------------------------------
+Feature Matrix: X[m][n] where m=samples, n=9
+Outcome Vector: y[m] with values {+1, -1}
+Encoding:
+  Features: x=+1.0, o=-1.0, b=0.0
+  Outcomes: win=+1, lose=-1
+
+FULL DATASET STATISTICS
+----------------------------------------
+Total samples: 5478
+Matrix dimensions: X[5478][9]
+Win samples (y=+1):  2936 (53.60%)
+Lose samples (y=-1): 1474 (26.91%)
+
+TRAINING SET STATISTICS
+----------------------------------------
+Total samples: 4382 (79.99%)
+Matrix dimensions: X_train[4382][9]
+Win samples (y=+1):  2331 (53.19%)
+Lose samples (y=-1): 1183 (27.00%)
+
+TESTING SET STATISTICS
+----------------------------------------
+Total samples: 1096 (20.01%)
+Matrix dimensions: X_test[1096][9]
+Win samples (y=+1):  605 (55.20%)
+Lose samples (y=-1): 291 (26.55%)
+
+CLASS BALANCE ANALYSIS
+----------------------------------------
+Full dataset balance: 53.60% win, 26.91% lose
+Training set balance: 53.19% win, 27.00% lose
+Testing set balance:  55.20% win, 26.55% lose
+
+ADVANTAGES OF MATRIX FORMAT
+----------------------------------------
+1. Standard ML format (X, y notation)
+2. Direct linear algebra operations
+3. Efficient memory access patterns
+4. Compatible with numerical libraries
+5. Binary classification (no ambiguous draws)
+
