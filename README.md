@@ -1,125 +1,53 @@
-# Tic-Tac-Toe Machine Learning Project
+# Tic-Tac-Toe for Kids (PM Mini Project 2025)
 
-Machine learning implementation with format-agnostic architecture.
+A lightweight Tic-Tac-Toe game with a friendly GUI, two-player mode, and a computer opponent. You can pick classic minimax or try the included ML bots (Q-Learning, Linear Regression, Naive Bayes). Everything is wired for quick training, swapping models, and showing imperfect difficulty so kids can actually win.
 
-## Project Overview
+## Highlights
+- Raylib GUI: clear board, turn indicator, winner announcement.
+- Two-player local play for quick matches.
+- Single-player vs AI: minimax plus adjustable difficulty; ML bots for variety.
+- Ready-made training scripts and stored model files.
+- Runs on Windows with MinGW-w64; code is plain C.
 
-All three AI algorithms can be trained using either character or numerical matrix format and deployed in the same game without code changes.
+## Repo map
+- TTTGUI (Main Game Folder)/: GUI, game loop, prebuilt `ttt_gui.exe`, `game.c/h`, AI hooks.
+- dataset/: 958-row tic-tac-toe dataset (features 1/-1/0, labels +1/-1).
+- experiment/: batch scripts to train/apply ML models.
+- evaluation/: saved metrics and summaries.
+- src/: training code
+  - model training matrix/: linear regression + Naive Bayes trainers
+  - q-learning training/: Q-learning trainer and frozen models
+- docs/: `ADDING_AI_MODELS.md`, `MODULAR_AI_QUICKSTART.md`, etc.
 
-## AI Models (Matrix-Trained)
-
-| Model | Accuracy | Status |
-|-------|----------|--------|
-| Q-Learning | ~88% | Implemented |
-| Linear Regression | 57.85% | Implemented |
-| Naive Bayes | 52.19% | Implemented |
-
-## Project Structure
-
+## Play the game (Windows)
 ```
-prog-meth-project/
-├── TTTGUI (Main Game Folder)/
-│   ├── ttt_gui.exe
-│   ├── game.c/h
-│   └── *_ai.c/h
-├── models/
-│   ├── linear_regression_non_terminal/
-│   ├── naive_bayes_non_terminal/
-│   ├── q learning/
-│   └── backups/
-├── dataset/
-│   └── new processed/
-├── src/
-│   ├── model training matrix/
-│   ├── q-learning training/
-│   └── data related/
-├── evaluation/
-└── experiment/
-```
-
-## Quick Start
-
-### Play the Game
-```bash
 cd "TTTGUI (Main Game Folder)"
-./ttt_gui.exe
+ttt_gui.exe
 ```
+- Pick two-player for manual play, or single-player to face the AI. Difficulty options are in the UI.
 
-### Train Models
-```bash
+## Train or refresh ML models
+```
 cd experiment
-./train_matrix_models_simple.bat
+./train_matrix_models_simple.bat      # trains linear regression + Naive Bayes on 80/20 split
+./implement_matrix_models.bat         # copies trained weights/tables into the GUI models folder
 ```
+- Check results in `evaluation/MATRIX_MODEL_EVALUATION_SUMMARY.txt` (accuracy, precision/recall, confusion matrix).
+- Q-learning scripts and frozen weights live in `src/q-learning training/` (`frozen_q_model.*`).
 
-### Deploy Models
-```bash
-cd experiment
-./implement_matrix_models.bat
-```
+## Tuning for the brief
+- Minimax baseline: adjust depth/pruning if you need to save time/memory on low-end hardware.
+- Imperfect AI: cap search depth or add light randomness so the computer doesn’t always win; log win rates.
+- ML option: wire the trained model into the GUI AI hook and report train/test accuracy + confusion matrix.
+- Compare minimax vs ML: note win rate, response time, and memory; recommend when to use each.
 
-## Training Details
+## Build notes
+- C + GCC (MinGW-w64). Raylib powers the GUI.
+- Data encoding: `1` = X, `-1` = O, `0` = empty; labels +1/-1.
+- Model files are plain text (weights/tables/Q-values). See `ADDING_AI_MODELS.md` or `MODULAR_AI_QUICKSTART.md` to swap models.
 
-### Dataset Format
-- Features: 1.0 (X), -1.0 (O), 0.0 (empty)
-- Outcomes: +1 (win), 0 (draw), -1 (lose)
-- Samples: 4,382 combined, 3,616 non-terminal
-- Split: 80/20 train/test
-
-### Algorithms
-- Linear Regression: Batch Gradient Descent, 1000 epochs, lr=0.01
-- Naive Bayes: Probability-based with Laplace smoothing
-- Q-Learning: Temporal Difference, 50,000 episodes
-
-## Technical Architecture
-
-### Format-Agnostic Design
-The game code remains unchanged regardless of training format. Models trained on numerical matrix format work identically to character format models.
-
-### Model Storage
-- Linear Regression: 10 weights (bias + 9 features)
-- Naive Bayes: Probability tables
-- Q-Learning: State-action Q-values
-
-## Performance Results
-
-- Linear Regression: 57.85% accuracy, 61.53% precision, 79.48% recall
-- Naive Bayes: 52.19% accuracy, 63.37% precision, 58.82% recall
-- Q-Learning: ~88% accuracy
-
-## Development Workflow
-
-1. Process datasets: `dataset_processor_matrix.c`
-2. Train models: `train_matrix_models_simple.bat`
-3. Evaluate: Built-in metrics
-4. Implement: `implement_matrix_models.bat`
-5. Play: `ttt_gui.exe`
-
-## Documentation
-
-- Game Guide: `TTTGUI (Main Game Folder)/README.md`
-- Evaluation Results: `evaluation/MATRIX_MODEL_EVALUATION_SUMMARY.txt`
-- Q-Learning Guide: `src/Q_LEARNING_GUIDE.md`
-
-## Technical Requirements
-
-- Compiler: GCC (MinGW-w64)
-- Graphics: Raylib
-- Platform: Windows
-- Language: C
-
-## Model Format
-
-All models use text format:
-- Linear Regression: Plain text weights
-- Naive Bayes: Probability tables
-- Q-Learning: State-action Q-values
-
-## Key Features
-
-- Three AI algorithms (Q-Learning, Linear Regression, Naive Bayes)
-- Matrix-trained models
-- Format-agnostic architecture
-- Automatic model backups
-- Comprehensive evaluation tools
-- Graphical UI with Raylib
-- Ternary classification (win/draw/lose)
+## Submission prep (adapt names to your group)
+- Zip/tgz named `UoG-PM` that expands to `UoG-PM_Groupxx/`.
+- Include sources, headers, assets, scripts, trained models, and the runnable `.exe`.
+- Add `PMReportGroupxx.pdf` with design notes, pseudocode, plots/results, and a short comparison between minimax and your ML pick.
+- Bundle testing evidence: platform specs, timing/memory snapshots, user-testing photos/quotes, and any tweaks made from feedback.
