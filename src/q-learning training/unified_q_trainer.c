@@ -1,5 +1,3 @@
-// unified_q_trainer.c - Unified Q-Learning training system
-// Supports: from-scratch, dataset-init, and resume from checkpoint
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,24 +11,20 @@
 #define PLAYER_X 'x'
 #define PLAYER_O 'o'
 
-// Training modes
 typedef enum {
-    MODE_FROM_SCRATCH,      // Pure RL from zero
-    MODE_DATASET_INIT,      // Initialize from dataset
-    MODE_RESUME             // Resume from checkpoint
+    MODE_FROM_SCRATCH,
+    MODE_DATASET_INIT,
+    MODE_RESUME
 } TrainingMode;
 
-// Q-Learning hyperparameters
 #define ALPHA 0.3
 #define GAMMA 0.95
 #define EPSILON_MIN 0.05
 #define EPSILON_DECAY 0.99995
 
-// Checkpointing
 #define CHECKPOINT_INTERVAL 1000
 #define STATS_INTERVAL 100
 
-// Rewards
 #define REWARD_WIN 1.0
 #define REWARD_DRAW 0.5
 #define REWARD_LOSE -1.0

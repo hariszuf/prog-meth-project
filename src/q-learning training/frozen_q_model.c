@@ -1,11 +1,8 @@
-// frozen_q_model.c - Read-only Q-Learning model implementation
-// Supports loading any trained model for deployment
 #include "frozen_q_model.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-// Internal Q-table entry structure
 typedef struct QEntry {
     char board[BOARD_SIZE];
     int action;
@@ -13,15 +10,13 @@ typedef struct QEntry {
     struct QEntry *next;
 } QEntry;
 
-// Internal model structure (hidden from users)
 struct FrozenQModel {
     QEntry *table[Q_TABLE_SIZE];
     int total_entries;
-    int is_frozen; // Always 1 for deployed models
-    char model_name[256]; // Track which model is loaded
+    int is_frozen;
+    char model_name[256];
 };
 
-// Hash function for board state
 static unsigned long hash_board(const char board[BOARD_SIZE]) {
     unsigned long hash = 5381;
     for (int i = 0; i < BOARD_SIZE; i++) {
@@ -30,7 +25,6 @@ static unsigned long hash_board(const char board[BOARD_SIZE]) {
     return hash % Q_TABLE_SIZE;
 }
 
-// Load a frozen Q-Learning model from file
 FrozenQModel* frozen_q_load(const char *filename) {
     FILE *fp = fopen(filename, "r");
     if (!fp) {
@@ -44,7 +38,6 @@ FrozenQModel* frozen_q_load(const char *filename) {
         return NULL;
     }
     
-    // Initialize
     for (int i = 0; i < Q_TABLE_SIZE; i++) {
         model->table[i] = NULL;
     }
@@ -53,7 +46,6 @@ FrozenQModel* frozen_q_load(const char *filename) {
     strncpy(model->model_name, filename, sizeof(model->model_name) - 1);
     model->model_name[sizeof(model->model_name) - 1] = '\0';
     
-    // Parse file (supports all trained model formats)
     char line[256];
     while (fgets(line, sizeof(line), fp)) {
         if (line[0] == '#' || line[0] == '\n') continue;
@@ -62,7 +54,6 @@ FrozenQModel* frozen_q_load(const char *filename) {
         int action;
         double q_value;
         
-        // Parse: b,b,b,b,b,b,b,b,b,0,0.5[,visits]
         char *token = strtok(line, ",");
         for (int i = 0; i < BOARD_SIZE && token != NULL; i++) {
             board[i] = token[0];
@@ -74,9 +65,7 @@ FrozenQModel* frozen_q_load(const char *filename) {
             token = strtok(NULL, ",");
             if (token != NULL) {
                 q_value = atof(token);
-                // Ignore visits field (optional 4th column)
                 
-                // Add entry to hash table
                 unsigned long hash = hash_board(board);
                 QEntry *new_entry = (QEntry *)malloc(sizeof(QEntry));
                 memcpy(new_entry->board, board, BOARD_SIZE);
