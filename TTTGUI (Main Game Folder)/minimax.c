@@ -1,281 +1,279 @@
-// minimax.c — simple Tic-Tac-Toe AI with optional depth caps
-#include <stdlib.h>          // for rand()
+#include <stdlib.h>   // for rand()
 
 // Check if player p ('X' or 'O') has any winning line on board b
 int winBy(char b[9], char p)
 {
-    // check all 8 lines (3 rows, 3 cols, 2 diagonals)
+    // 3 rows
     if (b[0] == p && b[1] == p && b[2] == p) return 1;
     if (b[3] == p && b[4] == p && b[5] == p) return 1;
     if (b[6] == p && b[7] == p && b[8] == p) return 1;
 
+    // 3 columns
     if (b[0] == p && b[3] == p && b[6] == p) return 1;
     if (b[1] == p && b[4] == p && b[7] == p) return 1;
     if (b[2] == p && b[5] == p && b[8] == p) return 1;
 
+    // 2 diagonals
     if (b[0] == p && b[4] == p && b[8] == p) return 1;
     if (b[2] == p && b[4] == p && b[6] == p) return 1;
 
-    return 0; // no winning line
+    return 0;  // no winning line
 }
 
-// Helper: return 1 if there is at least one empty cell
+// Check if board has at least one empty space (not 'X' or 'O')
 static int has_space(const char b[9])
 {
-                   
-    for (int i = 0; i < 9; i++)                 // scan all cells
+    for (int i = 0; i < 9; i++)
     {
-        if (b[i] != 'X' && b[i] != 'O')     // if we find a non-X/O
+        if (b[i] != 'X' && b[i] != 'O')
         {
-            return 1;                       // there is space
+            return 1;          // found at least one empty cell
         }
     }
-    return 0;                               // no space left
+    return 0;                  // board is full
 }
 
-// Helper: evaluate terminal board; positive is good for 'O'
+// Evaluate board: +10 = O wins, -10 = X wins, 0 = none/draw
 static int eval(const char b[9])
 {
-    if (winBy((char*)b, 'O'))               // if O wins
+    if (winBy((char*)b, 'O'))
     {
-        return 10;                          // good score
+        return 10;             // good for O
+    }
+    else if (winBy((char*)b, 'X'))
+    {
+        return -10;            // bad for O
     }
     else
     {
-        if (winBy((char*)b, 'X'))           // if X wins
-        {
-            return -10;                     // bad score for O
-        }
-        else
-        {
-            return 0;                       // draw or not terminal
-        }
+        return 0;              // draw or non-terminal (handled above in minimax)
     }
 }
 
-// Recursive minimax with optional depth cap (maxDepth==0 means full search)
+// Minimax with optional depth cap (maxDepth==0 means full search)
 static int minimax_cap(char b[9], int isMax, int depth, int maxDepth)
 {
-    int score;                              // current board evaluation
-    int i;                                  // loop counter
-    int best;                               // best score for this player
-    int value;                              // score of a particular move
-    char save;                              // to undo move
+    int score;
+    int i;
+    int best;
+    int value;
+    char save;
 
-    score = eval(b);                        // check if someone already won
+    // First, check terminal states (win / loss / draw)
+    score = eval(b);
 
-    if (score == 10)                        // O has a win on board
+    if (score == 10)           // O has a win on board
     {
-        return score - depth;               // prefer quicker wins
+        return score - depth;  // earlier wins are better
     }
+    else if (score == -10)     // X has a win on board
+    {
+        return score + depth;  // later losses are slightly less bad
+    }
+    else if (!has_space(b))    // no empty cells → draw
+    {
+        return 0;
+    }
+
+    // Apply depth limit if maxDepth > 0
+    if (maxDepth > 0 && depth >= maxDepth)
+    {
+        // At depth cap we stop looking further.
+        // Returning 0 means “treat it as unknown / neutral”.
+        return 0;
+    }
+
+    // Maximizing player: O
+    if (isMax)
+    {
+        best = -1000;          // very low initial score
+
+        for (i = 0; i < 9; i++)
+        {
+            if (b[i] != 'X' && b[i] != 'O')   // only try empty cells
+            {
+                save = b[i];
+                b[i] = 'O';                   // O plays here
+
+                // Next turn is X (minimizing), depth+1
+                value = minimax_cap(b, 0, depth + 1, maxDepth);
+
+                b[i] = save;                  // undo move
+
+                if (value > best)
+                {
+                    best = value;             // keep best score for O
+                }
+            }
+        }
+        return best;
+    }
+    // Minimizing player: X
     else
     {
-        if (score == -10)                   // X has a win on board
+        best = 1000;           // very high initial score
+
+        for (i = 0; i < 9; i++)
         {
-            return score + depth;           // prefer slower losses
-        }
-        else
-        {
-            if (!has_space(b))              // draw (no space)
+            if (b[i] != 'X' && b[i] != 'O')   // only try empty cells
             {
-                return 0;                   // neutral score
-            }
-            else
-            {
-                if (maxDepth > 0)           // use a depth limit?
+                save = b[i];
+                b[i] = 'X';                   // X plays here
+
+                // Next turn is O (maximizing), depth+1
+                value = minimax_cap(b, 1, depth + 1, maxDepth);
+
+                b[i] = save;                  // undo move
+
+                if (value < best)
                 {
-                    if (depth >= maxDepth)  // reached the cap
-                    {
-                        return 0;           // return neutral at cap
-                    }
+                    best = value;             // keep lowest score for X
                 }
             }
         }
-    }
-
-    if (isMax)                              // O's turn (maximize score)
-    {
-        best = -1000;                       // start with very low
-        for (i = 0; i < 9; i++)             // try all cells
-        {
-            if (b[i] == 'X' || b[i] == 'O') // skip taken cells
-            {
-                // do nothing for taken cells
-            }
-            else
-            {
-                save = b[i];                // remember old value
-                b[i] = 'O';                 // make O's move
-                value = minimax_cap(b, 0, depth + 1, maxDepth); // now X's turn
-                b[i] = save;                // undo the move
-
-                if (value > best)           // found better score
-                {
-                    best = value;           // update best
-                }
-            }
-        }
-        return best;                        // best achievable for O
-    }
-    else                                    // X's turn (minimize score)
-    {
-        best = 1000;                        // start with very high
-        for (i = 0; i < 9; i++)             // try all cells
-        {
-            if (b[i] == 'X' || b[i] == 'O') // skip taken cells
-            {
-                // do nothing for taken cells
-            }
-            else
-            {
-                save = b[i];                // remember old value
-                b[i] = 'X';                 // make X's move
-                value = minimax_cap(b, 1, depth + 1, maxDepth); // now O's turn
-                b[i] = save;                // undo the move
-
-                if (value < best)           // found lower score
-                {
-                    best = value;           // update best (minimize)
-                }
-            }
-        }
-        return best;                        // best achievable for X (as minimizer)
+        return best;
     }
 }
 
 // Choose a move for 'O' given level: 1=Easy, 2=Medium, 3=Hard
 int findBestMoveLvl(char b[9], int level)
 {
-    int empty[9];                           // list of empty cell indices
-    int n;                                  // count of empty cells
-    int i;                                  // general loop
-    int j;                                  // loop over empty cells
-    int best;                               // best score encountered
-    int second;                             // second-best score (for medium)
-    int move;                               // chosen move index
-    int sec;                                // second-best move index
-    int value;                              // score for a candidate move
-    char save;                              // to undo move
+    int empty[9];     // indices of empty cells
+    int n;            // number of empty cells
+    int i, j;
+    int best, second;
+    int move, sec;
+    int value;
+    char save;
 
-    n = 0;                                  // start with 0 empty cells
-    for (i = 0; i < 9; i++)                 // scan all cells
+    // Collect all empty cell indices
+    n = 0;
+    for (i = 0; i < 9; i++)
     {
-        if (b[i] != 'X' && b[i] != 'O')     // if cell is empty
+        if (b[i] != 'X' && b[i] != 'O')
         {
-            empty[n] = i;                   // store its index
-            n = n + 1;                      // increase count
+            empty[n] = i;
+            n++;
         }
     }
 
-    if (n == 0)                             // no legal moves
+    if (n == 0)
     {
-        return -1;                          // signal failure
+        return -1;    // no legal moves
     }
 
-    // Level 1: mostly random, sometimes shallow lookahead
+    // -------- Level 1: Easy (50% random, 50% shallow minimax) --------
     if (level == 1)
     {
-        if ((rand() % 100) < 50)            // 50% chance: pick random empty
+        if ((rand() % 100) < 50)
         {
-            return empty[rand() % n];       // return random empty cell
+            // Half the time: completely random move
+            return empty[rand() % n];
         }
         else
         {
-            best = -1000;                   // else use shallow search
-            move = empty[0];                // initialize to something valid
+            
+            best = -1000;
+            move = empty[0];
 
-            for (j = 0; j < n; j++)         // try each empty position
+            for (j = 0; j < n; j++)
             {
-                i = empty[j];               // candidate index
-                save = b[i];                // remember old char
-                b[i] = 'O';                 // try placing O
-                value = minimax_cap(b, 0, 0, 1); // X responds, depth cap 1
-                b[i] = save;                // undo
+                i = empty[j];
+                save = b[i];
+                b[i] = 'O';
 
-                if (value > best)           // found higher score
+                // Depth cap 1
+                value = minimax_cap(b, 0, 0, 1);
+
+                b[i] = save;
+
+                if (value > best)
                 {
-                    best = value;           // update best score
-                    move = i;               // update move index
+                    best = value;
+                    move = i;
                 }
             }
 
-            return move;                    // return best shallow move
+            return move;
         }
     }
-    else
+
+    // -------- Level 2: Medium (mixture of best, second-best, random) --------
+    if (level == 2)
     {
-        // Level 2: usually best, sometimes second, sometimes random
-        if (level == 2)
+        best = -1000;
+        second = -1000;
+        move = empty[0];
+        sec = empty[0];
+
+        // Evaluate all empty cells with a deeper but still capped search (depth 3)
+        for (j = 0; j < n; j++)
         {
-            best = -1000;                   // best score so far
-            second = -1000;                 // second-best score
-            move = empty[0];                // best move index
-            sec = empty[0];                 // second move index
+            i = empty[j];
+            save = b[i];
+            b[i] = 'O';
 
-            for (j = 0; j < n; j++)         // check all candidates
-            {
-                i = empty[j];               // candidate index
-                save = b[i];                // remember old char
-                b[i] = 'O';                 // try placing O
-                value = minimax_cap(b, 0, 0, 3); // search up to depth 3
-                b[i] = save;                // undo
+            value = minimax_cap(b, 0, 0, 3);
 
-                if (value > best)           // if better than current best
-                {
-                    second = best;          // old best becomes second
-                    sec = move;             // old best move index becomes second
-                    best = value;           // update best score
-                    move = i;               // update best move index
-                }
-                else
-                {
-                    if (value > second)     // maybe it is second-best
-                    {
-                        second = value;     // update second score
-                        sec = i;            // update second index
-                    }
-                }
-            }
+            b[i] = save;
 
-            i = rand() % 100;               // choose behavior by probability
-            if (i < 20 && n >= 2)           // 20% choose second-best if exists
+            if (value > best)
             {
-                return sec;
+                // Shift best to second-best
+                second = best;
+                sec = move;
+
+                best = value;
+                move = i;
             }
-            else
+            else if (value > second)
             {
-                if (i < 30)                 // next 10% choose random
-                {
-                    return empty[rand() % n];
-                }
-                else
-                {
-                    return move;            // otherwise choose best
-                }
+                second = value;
+                sec = i;
             }
+        }
+
+        // Randomly decide whether to pick best, second-best, or a random move
+        i = rand() % 100;
+        if (i < 20 && n >= 2)
+        {
+            // 20% chance: second-best move 
+            return sec;
+        }
+        else if (i < 30)
+        {
+            // Next 10%: random move
+            return empty[rand() % n];
         }
         else
         {
-            // Level 3: full minimax search (no depth cap)
-            best = -1000;                   // start low
-            move = empty[0];                // initialize to valid position
-
-            for (j = 0; j < n; j++)         // try each empty cell
-            {
-                i = empty[j];               // candidate index
-                save = b[i];                // remember old char
-                b[i] = 'O';                 // try placing O
-                value = minimax_cap(b, 0, 0, 0); // full search
-                b[i] = save;                // undo
-
-                if (value > best)           // better score found
-                {
-                    best = value;           // update best score
-                    move = i;               // update move index
-                }
-            }
-
-            return move;                    // chosen move for hard level
+            // 70%: best minimax move
+            return move;
         }
     }
+
+    // -------- Level 3: Hard (full minimax, no depth cap) --------
+    // At this level, the AI plays perfectly.
+    best = -1000;
+    move = empty[0];
+
+    for (j = 0; j < n; j++)
+    {
+        i = empty[j];
+        save = b[i];
+        b[i] = 'O';
+
+        // maxDepth = 0  
+        value = minimax_cap(b, 0, 0, 0);
+
+        b[i] = save;
+
+        if (value > best)
+        {
+            best = value;
+            move = i;
+        }
+    }
+
+    return move;
 }

@@ -3,8 +3,8 @@
 #include <time.h>
 #include <windows.h>
 #include <psapi.h>
-#define STATS_FILE "tictactoe_stats.txt"
-#define AI_TIME_FILE "ai_timing.txt"
+#define STATS_FILE "./tictactoe_stats.txt"
+#define AI_TIME_FILE "./ai_timing.txt"
 
 
 
@@ -94,11 +94,12 @@ typedef struct {
 static void save_all(AllStats *all)
 {
     FILE *f = fopen(STATS_FILE, "w");
-    if (!f){
+    if (!f) {
+        printf("Error opening file for writing\n");
         return;
-    } 
+    }
 
-    // Write all numbers in order
+    // Write all numbers in order (PvP, Easy, Medium, Hard)
     fprintf(f,
         "%d %d %d %d "      // PvP
         "%d %d %d %d "      // Easy
@@ -112,15 +113,17 @@ static void save_all(AllStats *all)
     fclose(f);
 }
 
+
 static void load_all(AllStats *all)
 {
     FILE *f = fopen(STATS_FILE, "r");
     if (!f) {
-        *all = (AllStats){0};
+        *all = (AllStats){0}; // If the file doesn't exist, initialize to zero.
         return;
     }
 
-    fscanf(f,
+    // Attempt to read the stats from the file
+    if (fscanf(f,
         "%d %d %d %d "
         "%d %d %d %d "
         "%d %d %d %d "
@@ -128,18 +131,22 @@ static void load_all(AllStats *all)
         &all->pvp.games, &all->pvp.x_wins, &all->pvp.o_wins, &all->pvp.draws,
         &all->pvai.easy.games, &all->pvai.easy.x_wins, &all->pvai.easy.o_wins, &all->pvai.easy.draws,
         &all->pvai.medium.games, &all->pvai.medium.x_wins, &all->pvai.medium.o_wins, &all->pvai.medium.draws,
-        &all->pvai.hard.games, &all->pvai.hard.x_wins, &all->pvai.hard.o_wins, &all->pvai.hard.draws);
+        &all->pvai.hard.games, &all->pvai.hard.x_wins, &all->pvai.hard.o_wins, &all->pvai.hard.draws) != 16) {
+        // If reading fails (empty or malformed file), initialize to zero
+        *all = (AllStats){0};
+    }
 
     fclose(f);
 }
 
 // update of stats after a game ends
+// Update of stats after a game ends
 void stats_record_result_mode(StatsMode mode, int level, int winner)
 {
     AllStats all;
-    load_all(&all);
-    Stats *cat = NULL;
+    load_all(&all);  // Load current stats from file
 
+    Stats *cat = NULL;
     if (mode == STATS_PVP) {
         cat = &all.pvp;
     } 
@@ -154,26 +161,25 @@ void stats_record_result_mode(StatsMode mode, int level, int winner)
             cat = &all.pvai.hard;
         }
         else {
-            return; // invalid level
+            return; // Invalid level
         }
     }
     else {
-        return; // invalid mode
+        return; // Invalid mode
     }
 
+    // Update stats based on winner
     cat->games++;
-
     if (winner == 1) {
         cat->x_wins++;
-    }
-    else if (winner == 2) {
+    } else if (winner == 2) {
         cat->o_wins++;
-    }
-    else {
+    } else {
         cat->draws++;
     }
 
-    save_all(&all);
+    // Save updated stats to the file
+    save_all(&all);  // Ensure this is being called to write to the file
 }
 
 // return stats of the given mode and level
@@ -215,35 +221,17 @@ void stats_get_counts_mode(StatsMode mode, int level, int *games, int *x_wins, i
 
 void stats_reset_pvp(void)
 {
-    FILE *f = fopen(STATS_FILE, "r");
-    int pvp_g, pvp_x, pvp_o, pvp_d;
-    int ai_g, ai_x, ai_o, ai_d;
+    AllStats all;
 
-    // If file exists, read current stats
-    if (f)
-    {
-        fscanf(f, "%d %d %d %d %d %d %d %d",
-               &pvp_g, &pvp_x, &pvp_o, &pvp_d,
-               &ai_g, &ai_x, &ai_o, &ai_d);
-        fclose(f);
-    }
-    else
-    {
-        // If no file, initialize to 0
-        pvp_g = pvp_x = pvp_o = pvp_d = 0;
-        ai_g = ai_x = ai_o = ai_d = 0;
-    }
+    // Load everything from the stats file
+    load_all(&all);
 
-    // Reset PvP only
-    pvp_g = pvp_x = pvp_o = pvp_d = 0;
+    // Reset ONLY the PvP block
+    all.pvp.games  = 0;
+    all.pvp.x_wins = 0;
+    all.pvp.o_wins = 0;
+    all.pvp.draws  = 0;
 
-    // Write updated stats back
-    f = fopen(STATS_FILE, "w");
-    if (f)
-    {
-        fprintf(f, "%d %d %d %d %d %d %d %d\n",
-                pvp_g, pvp_x, pvp_o, pvp_d,
-                ai_g, ai_x, ai_o, ai_d);
-        fclose(f);
-    }
+    // Save back
+    save_all(&all);
 }
