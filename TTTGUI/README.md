@@ -24,7 +24,7 @@ Before you can run the game, ensure you have the following installed:
 
 ##### Navigate to the Project Folder
 1. Open your terminal (or command prompt).
-2. Navigate to the folder where the project files(TTTGUI Main Game Folder) are stored.
+2. Navigate to the folder where the project files(TTTGUI) are stored.
 
 ##### Compile the Game
 To compile the source code, run the `compile.bat` batch file. This will automatically compile the source code and create the executable.
