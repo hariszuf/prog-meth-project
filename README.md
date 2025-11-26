@@ -45,9 +45,3 @@ cd experiment
 - C + GCC (MinGW-w64). Raylib powers the GUI.
 - Data encoding: `1` = X, `-1` = O, `0` = empty; labels +1/-1.
 - Model files are plain text (weights/tables/Q-values). See `ADDING_AI_MODELS.md` or `MODULAR_AI_QUICKSTART.md` to swap models.
-
-## Submission prep (adapt names to your group)
-- Zip/tgz named `UoG-PM` that expands to `UoG-PM_Groupxx/`.
-- Include sources, headers, assets, scripts, trained models, and the runnable `.exe`.
-- Add `PMReportGroupxx.pdf` with design notes, pseudocode, plots/results, and a short comparison between minimax and your ML pick.
-- Bundle testing evidence: platform specs, timing/memory snapshots, user-testing photos/quotes, and any tweaks made from feedback.
