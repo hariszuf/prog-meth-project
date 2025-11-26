@@ -1,6 +1,6 @@
 # Tic-Tac-Toe Machine Learning Project
 
-Machine learning implementation with format-agnostic architecture demonstrating that training format (character vs matrix) doesn't affect game deployment.
+Machine learning implementation with format-agnostic architecture.
 
 ## Project Overview
 
