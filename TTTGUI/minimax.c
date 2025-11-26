@@ -3,31 +3,31 @@
 // Check if player p ('X' or 'O') has any winning line on board b
 int winBy(char b[9], char p)
 {
-    // 3 rows
+    
     if (b[0] == p && b[1] == p && b[2] == p) return 1;
     if (b[3] == p && b[4] == p && b[5] == p) return 1;
     if (b[6] == p && b[7] == p && b[8] == p) return 1;
 
-    // 3 columns
+    
     if (b[0] == p && b[3] == p && b[6] == p) return 1;
     if (b[1] == p && b[4] == p && b[7] == p) return 1;
     if (b[2] == p && b[5] == p && b[8] == p) return 1;
 
-    // 2 diagonals
+    
     if (b[0] == p && b[4] == p && b[8] == p) return 1;
     if (b[2] == p && b[4] == p && b[6] == p) return 1;
 
-    return 0;  // no winning line
+    return 0; 
 }
 
-// Check if board has at least one empty space (not 'X' or 'O')
+// Check if board has at least one empty space
 static int has_space(const char b[9])
 {
     for (int i = 0; i < 9; i++)
     {
         if (b[i] != 'X' && b[i] != 'O')
         {
-            return 1;          // found at least one empty cell
+            return 1;        
         }
     }
     return 0;                  // board is full
@@ -38,19 +38,19 @@ static int eval(const char b[9])
 {
     if (winBy((char*)b, 'O'))
     {
-        return 10;             // good for O
+        return 10;             
     }
     else if (winBy((char*)b, 'X'))
     {
-        return -10;            // bad for O
+        return -10;          
     }
     else
     {
-        return 0;              // draw or non-terminal (handled above in minimax)
+        return 0;              
     }
 }
 
-// Minimax with optional depth cap (maxDepth==0 means full search)
+// Minimax with optional depth cap
 static int minimax_cap(char b[9], int isMax, int depth, int maxDepth)
 {
     int score;
@@ -78,8 +78,7 @@ static int minimax_cap(char b[9], int isMax, int depth, int maxDepth)
     // Apply depth limit if maxDepth > 0
     if (maxDepth > 0 && depth >= maxDepth)
     {
-        // At depth cap we stop looking further.
-        // Returning 0 means “treat it as unknown / neutral”.
+
         return 0;
     }
 
@@ -138,8 +137,8 @@ static int minimax_cap(char b[9], int isMax, int depth, int maxDepth)
 // Choose a move for 'O' given level: 1=Easy, 2=Medium, 3=Hard
 int findBestMoveLvl(char b[9], int level)
 {
-    int empty[9];     // indices of empty cells
-    int n;            // number of empty cells
+    int empty[9];    
+    int n;         
     int i, j;
     int best, second;
     int move, sec;
@@ -159,7 +158,7 @@ int findBestMoveLvl(char b[9], int level)
 
     if (n == 0)
     {
-        return -1;    // no legal moves
+        return -1;   
     }
 
     // -------- Level 1: Easy (50% random, 50% shallow minimax) --------
