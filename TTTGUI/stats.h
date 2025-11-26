@@ -19,6 +19,6 @@ void stats_get_counts_mode(StatsMode mode, int level,
 void stats_reset_pvp(void);
 
 // stats.h
-void stats_log_ai_move(int mode, int level, int move_no, double ms);
+void stats_log_ai_move(int mode, int level, int move_no, double ms, int depth);
 
 #endif // STATS_H

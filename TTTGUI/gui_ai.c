@@ -70,6 +70,7 @@ static void DrawGamePieces(const char* board)
 
 int main(void)
 {
+    printf("WORKING DIR = %s\n", GetWorkingDirectory());
     InitWindow(W_WIDTH, W_HEIGHT, "Tic Tac Toe (GUI)");
     SetTargetFPS(60);
     SetRandomSeed((unsigned)time(NULL));
@@ -183,8 +184,8 @@ int main(void)
             game_ai_move(&g, level);
             double ms = (GetTime() - t0) * 1000.0;
             
-            ai_move_no++;
-            stats_log_ai_move(mode, level, ai_move_no, ms);
+            int depth_used = (level == 1 ? 1 : (level == 2 ? 3 : 0));
+            stats_log_ai_move(mode, level, ai_move_no, ms, depth_used);
             game_check_end(&g);
         }
 

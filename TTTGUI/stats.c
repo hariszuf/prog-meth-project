@@ -3,8 +3,10 @@
 #include <time.h>
 #include <windows.h>
 #include <psapi.h>
-#define STATS_FILE "./tictactoe_stats.txt"
-#define AI_TIME_FILE "./ai_timing.txt"
+#define AI_TIME_FILE "ai_timing.txt"
+#define STATS_FILE "tictactoe_stats.txt"
+
+
 
 
 
@@ -25,49 +27,36 @@ static double get_memory_kb(void)
 
 
 // Record AI performance data to log file
-void stats_log_ai_move(int mode, int level, int move_no, double ms)
+void stats_log_ai_move(int mode, int level, int move_no, double ms, int depth)
 {
     FILE *f = fopen(AI_TIME_FILE, "a");
-
-    if (!f) {
-        return; 
-    }
+    if (!f) return;
 
     time_t now = time(NULL);
-
     struct tm *lt = localtime(&now);
 
     char ts[32];
-
     strftime(ts, sizeof ts, "%Y-%m-%d %H:%M:%S", lt);
 
-    const char *levelmode;
-
-    if (level == 1) {
-        levelmode = "Easy";
-    }
-    else if (level == 2) {
-        levelmode = "Medium";
-    }
-    else if (level == 3) {
-        levelmode = "Hard";
-    }
-    else {
-        levelmode = "Unknown";
-    }
+    const char *levelmode =
+        (level == 1) ? "Easy" :
+        (level == 2) ? "Medium" :
+        (level == 3) ? "Hard" : "Unknown";
 
     double mem_kb = get_memory_kb();
 
-    fprintf(f, "%s, mode=%s, level=%s, move=%d, ms=%.3f, mem=%.2fKB\n",
+    fprintf(f, "%s, mode=%s, level=%s, move=%d, ms=%.3f, depth=%d, mem=%.2fKB\n",
             ts,
             (mode == 0 ? "PVP" : "PVAI"),
             levelmode,
             move_no,
             ms,
+            depth,
             mem_kb);
 
     fclose(f);
 }
+
 
 
 // Each category keeps total games, wins for X, wins for O, and draws
